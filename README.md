@@ -17,11 +17,12 @@ Website portofolio pengembang berbasis **Next.js 16 (App Router)**, **React 19**
   - `01 // DEVELOPER PROFILE`: Profil singkat dengan optimasi foto profil GitHub menggunakan komponen `next/image`.
   - `02 // ENGINEERING & RESEARCH FOCUS`: Tiga pilar eksplorasi utama (*Autonomous AI*, *Embedded Systems & Computer Vision*, serta *Interactive 3D Web & UI/UX*).
   - `03 // TECH STACK & TOOLING MATRIX`: Pengelompokan keahlian teknis secara modular.
-  - `04 // REPOSITORIES & NETWORK`: Tautan langsung ke repositori GitHub dan Git-Eng UKWMS.
+  - `04 // VERIFIED CREDENTIALS & BADGES`: Menampilkan 4 lencana sertifikasi digital terverifikasi dari **Credly** (*IBM SkillsBuild* & *Certiport*) lengkap dengan optimasi emblem `next/image` dan tautan verifikasi langsung.
+  - `05 // REPOSITORIES & PROFESSIONAL NETWORK`: Tautan langsung ke GitHub, LinkedIn, Credly, dan Git-Eng UKWMS.
 - **Project Suite Catalog (`app/projects/page.tsx`):**
   Katalog modul proyek perangkat lunak, perangkat keras/robotika, visualisasi 3D, dan riset UI/UX (*ChiefOfStaff AI*, *Desktop Face-Tracking Robot*, *3D Math Vector Visualizer*, dan *Smart Energy Monitoring UI/UX*) lengkap dengan *badge* status, rincian spesifikasi teknis, dan tautan sumber.
 - **Konfigurasi Next.js (`next.config.ts`):**
-  Mendefinisikan `images.remotePatterns` untuk mengizinkan optimasi gambar eksternal dari GitHub secara aman.
+  Mendefinisikan `images.remotePatterns` untuk mengizinkan optimasi gambar eksternal dari GitHub dan Credly (`images.credly.com`) secara aman.
 
 ---
 

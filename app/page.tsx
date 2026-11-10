@@ -40,6 +40,53 @@ const techCategories = [
   },
 ];
 
+const credlyBadges = [
+  {
+    id: "01",
+    name: "Build an AI Agent",
+    issuer: "IBM SkillsBuild",
+    issuedAt: "Sep 2026",
+    imageUrl:
+      "https://images.credly.com/images/d8f30e8e-4c24-42e8-bb15-b106bb082614/BadgeEmblem_BuildAnAIAgent.png",
+    verifyUrl:
+      "https://www.credly.com/badges/870b43c0-b1c6-4722-9dc5-89ef961ffbe3",
+    skills: ["Agentic AI", "IBM watsonx.ai", "AI Agent Workflow"],
+  },
+  {
+    id: "02",
+    name: "AI Literacy",
+    issuer: "IBM SkillsBuild",
+    issuedAt: "Oct 2026",
+    imageUrl:
+      "https://images.credly.com/images/bc70837c-99ae-499d-a31d-2a7be79095e6/BadgeEmblem_AILiteracy.png",
+    verifyUrl:
+      "https://www.credly.com/badges/6cf16fde-7229-42db-990a-c2b731aa6f46",
+    skills: ["Generative AI", "Prompt Writing", "Responsible AI"],
+  },
+  {
+    id: "03",
+    name: "Getting Started with Data",
+    issuer: "IBM SkillsBuild",
+    issuedAt: "Sep 2026",
+    imageUrl:
+      "https://images.credly.com/images/9a6e098a-618a-4e5a-8e8e-364a66b2f3de/Getting_20Started_20With_20Data_20Badge.png",
+    verifyUrl:
+      "https://www.credly.com/badges/bab85aa1-d5f5-4b96-ba5d-d7a6f037f367",
+    skills: ["Data Analytics", "Data Science", "Tableau"],
+  },
+  {
+    id: "04",
+    name: "IC3 Digital Literacy GS6 Level 1",
+    issuer: "Certiport // Pearson VUE",
+    issuedAt: "Jun 2026",
+    imageUrl:
+      "https://images.credly.com/images/29a6f7a3-2cf6-426c-969d-e432b44532e0/IC3_Digital_Literacy_Levels_1.png",
+    verifyUrl:
+      "https://www.credly.com/badges/660410c1-846e-4cca-86d2-6b033243b544",
+    skills: ["Software Concepts", "Digital Security", "Collaboration"],
+  },
+];
+
 export default function Home() {
   return (
     <div className="space-y-16 py-4">
@@ -102,7 +149,16 @@ export default function Home() {
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-950 px-4 py-2 text-sm font-medium text-zinc-300 hover:border-zinc-700 hover:text-white transition"
             >
-              <span>GitHub Profile</span>
+              <span>GitHub</span>
+              <span className="font-mono text-xs text-zinc-500">↗</span>
+            </a>
+            <a
+              href="https://www.linkedin.com/in/yohannes-marcel-lalopua-8bb10b31b/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-md border border-zinc-800 bg-zinc-950 px-4 py-2 text-sm font-medium text-zinc-300 hover:border-zinc-700 hover:text-white transition"
+            >
+              <span>LinkedIn</span>
               <span className="font-mono text-xs text-zinc-500">↗</span>
             </a>
           </div>
@@ -184,13 +240,85 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 04 // REPOSITORIES & CONNECT */}
+      {/* 04 // VERIFIED CREDENTIALS & BADGES */}
       <section className="space-y-5">
         <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3">
           <h2 className="font-mono text-xs tracking-wider text-zinc-400 uppercase">
-            04 // Repositories & Network
+            04 // Verified Credentials & Badges
           </h2>
-          <span className="font-mono text-xs text-zinc-600">EXTERNAL LINKS</span>
+          <a
+            href="https://www.credly.com/users/yohannes-lalopua/badges"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-xs text-emerald-400 hover:underline"
+          >
+            CREDLY VERIFIED ↗
+          </a>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {credlyBadges.map((badge) => (
+            <div
+              key={badge.id}
+              className="group rounded-xl border border-zinc-800/90 bg-zinc-900/30 p-5 hover:border-zinc-700 hover:bg-zinc-900/60 transition flex flex-col justify-between gap-4"
+            >
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 rounded-lg border border-zinc-800 bg-zinc-950 p-2">
+                  <Image
+                    src={badge.imageUrl}
+                    alt={badge.name}
+                    width={64}
+                    height={64}
+                    className="h-16 w-16 object-contain"
+                  />
+                </div>
+
+                <div className="space-y-1.5 min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2 font-mono text-[11px] text-zinc-500">
+                    <span className="truncate">{badge.issuer}</span>
+                    <span className="shrink-0 text-zinc-400">
+                      {badge.issuedAt}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-semibold text-zinc-100 group-hover:text-white transition leading-snug">
+                    {badge.name}
+                  </h3>
+                  <div className="flex flex-wrap gap-1.5 pt-1">
+                    {badge.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className="rounded border border-zinc-800 bg-zinc-950/80 px-2 py-0.5 font-mono text-[10px] text-zinc-300"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between border-t border-zinc-800/70 pt-3 font-mono text-xs">
+                <span className="text-zinc-500">CREDENTIAL // {badge.id}</span>
+                <a
+                  href={badge.verifyUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-zinc-300 hover:text-emerald-400 transition"
+                >
+                  Verify Badge ↗
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 05 // REPOSITORIES & PROFESSIONAL NETWORK */}
+      <section className="space-y-5">
+        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-3">
+          <h2 className="font-mono text-xs tracking-wider text-zinc-400 uppercase">
+            05 // Repositories & Professional Network
+          </h2>
+          <span className="font-mono text-xs text-zinc-600">4 CHANNELS</span>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
@@ -217,13 +345,57 @@ export default function Home() {
           </a>
 
           <a
-            href="https://git-eng.ukwms.ac.id/5803025050"
+            href="https://www.linkedin.com/in/yohannes-marcel-lalopua-8bb10b31b/"
             target="_blank"
             rel="noopener noreferrer"
             className="group rounded-xl border border-zinc-800/90 bg-zinc-900/30 p-5 hover:border-zinc-700 hover:bg-zinc-900/60 transition flex items-center justify-between"
           >
             <div className="space-y-1">
               <div className="font-mono text-xs text-sky-400">
+                LINKEDIN // PROFESSIONAL PROFILE
+              </div>
+              <div className="text-base font-semibold text-zinc-100">
+                Yohannes Marcel Lalopua
+              </div>
+              <p className="text-xs text-zinc-400">
+                Jaringan profesional, rekam jejak akademik, dan koneksi industri.
+              </p>
+            </div>
+            <span className="font-mono text-lg text-zinc-500 group-hover:text-zinc-200 group-hover:translate-x-0.5 transition">
+              ↗
+            </span>
+          </a>
+
+          <a
+            href="https://www.credly.com/users/yohannes-lalopua/badges"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group rounded-xl border border-zinc-800/90 bg-zinc-900/30 p-5 hover:border-zinc-700 hover:bg-zinc-900/60 transition flex items-center justify-between"
+          >
+            <div className="space-y-1">
+              <div className="font-mono text-xs text-amber-400">
+                CREDLY // DIGITAL CREDENTIALS
+              </div>
+              <div className="text-base font-semibold text-zinc-100">
+                credly.com/users/yohannes-lalopua
+              </div>
+              <p className="text-xs text-zinc-400">
+                Verifikasi sertifikasi resmi dari IBM SkillsBuild dan Certiport.
+              </p>
+            </div>
+            <span className="font-mono text-lg text-zinc-500 group-hover:text-zinc-200 group-hover:translate-x-0.5 transition">
+              ↗
+            </span>
+          </a>
+
+          <a
+            href="https://git-eng.ukwms.ac.id/5803025050"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group rounded-xl border border-zinc-800/90 bg-zinc-900/30 p-5 hover:border-zinc-700 hover:bg-zinc-900/60 transition flex items-center justify-between"
+          >
+            <div className="space-y-1">
+              <div className="font-mono text-xs text-violet-400">
                 GIT-ENG // UKWMS ACADEMIC
               </div>
               <div className="text-base font-semibold text-zinc-100">
