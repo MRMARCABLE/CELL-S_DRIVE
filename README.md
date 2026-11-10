@@ -1,18 +1,40 @@
 # Personal Developer Portfolio — Yohannes Marcel Lalopua
 
-Website portofolio minimalis berbasis **Next.js (App Router)** dan **Tailwind CSS** dengan fokus pada efisiensi kode dan struktur komponen yang bersih.
+Website portofolio pengembang berbasis **Next.js 16 (App Router)**, **React 19**, **TypeScript**, dan **Tailwind CSS v4** dengan pendekatan desain *Architectural Dark UI* yang terinspirasi dari ekosistem perangkat lunak modular modern.
+
+- **Nama:** Yohannes Marcel Lalopua
+- **NRP:** 5803025050
+- **Program Studi:** Teknik Informatika — Universitas Katolik Widya Mandala Surabaya (UKWMS)
+
+---
 
 ## Arsitektur & Rute Halaman
-- **Global Layout (`app/layout.tsx` & `components/Navbar.tsx`):** Kerangka utama bertema gelap (*dark mode*) yang memuat navigasi atas dan *footer* kontak di seluruh halaman.
-- **Home (`app/page.tsx`):** Menampilkan profil singkat dan daftar keahlian teknis (*Skills & Tech Stack*).
-- **Projects (`app/projects/page.tsx`):** Menampilkan daftar proyek perangkat lunak, sistem cerdas/IoT, dan desain UI/UX.
+
+- **Global Layout & Navigasi (`app/layout.tsx` & `components/Navbar.tsx`):**
+  Kerangka utama bertema gelap (`zinc-950`) dengan efek *ambient radial spotlight*, navigasi atas *sticky glassmorphism* (`backdrop-blur-md`) yang dilengkapi penanda rute aktif berbasis `usePathname()`, serta *engineering status footer* di seluruh halaman.
+- **Overview / Home Multi-Section (`app/page.tsx`):**
+  Halaman utama terstruktur dengan penomoran modul monospace:
+  - `01 // DEVELOPER PROFILE`: Profil singkat dengan optimasi foto profil GitHub menggunakan komponen `next/image`.
+  - `02 // ENGINEERING & RESEARCH FOCUS`: Tiga pilar eksplorasi utama (*Autonomous AI*, *Embedded Systems & Computer Vision*, serta *Interactive 3D Web & UI/UX*).
+  - `03 // TECH STACK & TOOLING MATRIX`: Pengelompokan keahlian teknis secara modular.
+  - `04 // REPOSITORIES & NETWORK`: Tautan langsung ke repositori GitHub dan Git-Eng UKWMS.
+- **Project Suite Catalog (`app/projects/page.tsx`):**
+  Katalog modul proyek perangkat lunak, perangkat keras/robotika, visualisasi 3D, dan riset UI/UX (*ChiefOfStaff AI*, *Desktop Face-Tracking Robot*, *3D Math Vector Visualizer*, dan *Smart Energy Monitoring UI/UX*) lengkap dengan *badge* status, rincian spesifikasi teknis, dan tautan sumber.
+- **Konfigurasi Next.js (`next.config.ts`):**
+  Mendefinisikan `images.remotePatterns` untuk mengizinkan optimasi gambar eksternal dari GitHub secara aman.
+
+---
 
 ## Teknologi yang Digunakan
-- Next.js (App Router)
-- React & TypeScript
-- Tailwind CSS
+
+- **Framework:** Next.js 16 (App Router & Turbopack)
+- **Library UI:** React 19 & TypeScript 5
+- **Styling & Tipografi:** Tailwind CSS v4, `Geist Sans`, & `Geist Mono` (`next/font/google`)
+
+---
 
 ## Cara Menjalankan di Lokal
+
 1. Instal seluruh dependensi paket:
    ```bash
    npm install
