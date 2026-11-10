@@ -14,26 +14,55 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Marca | Personal Portfolio",
-  description: "Informatics Student & Developer Portfolio",
+  title: "Marca | Yohannes Marcel Lalopua — Portfolio",
+  description:
+    "Informatics Student at UKWMS — Web Development, UI/UX, AI Agents & Embedded Systems Portfolio",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      lang="id"
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
+      <body className="relative min-h-full flex flex-col bg-zinc-950 text-zinc-100 selection:bg-emerald-500/20 selection:text-emerald-300">
+        {/* Ambient top radial spotlight inspired by ArtCraft */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-96 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(16,185,129,0.10),transparent)]"
+        />
+
         <Navbar />
-        <main className="flex-1 max-w-3xl w-full mx-auto px-6 py-10">
+
+        <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-12">
           {children}
         </main>
-        <footer className="border-t border-zinc-800 py-6 text-center text-sm text-zinc-500">
-          © 2026 Yohannes Marcel Lalopua —{" "}
-          <a href="https://github.com/" target="_blank" className="text-zinc-300 hover:underline">
-            GitHub
-          </a>
+
+        <footer className="border-t border-zinc-800/80 bg-zinc-950/90 py-8">
+          <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+            <div className="flex items-center gap-2 font-mono">
+              <span className="h-2 w-2 rounded-full bg-emerald-500/80" />
+              <span>© 2026 YOHANNES MARCEL LALOPUA // UKWMS INFORMATICS</span>
+            </div>
+            <div className="flex items-center gap-5 font-mono">
+              <a
+                href="https://github.com/MRMARCABLE"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-400 hover:text-zinc-100 transition"
+              >
+                GITHUB/MRMARCABLE ↗
+              </a>
+              <a
+                href="https://git-eng.ukwms.ac.id/5803025050"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-400 hover:text-zinc-100 transition"
+              >
+                GIT-ENG/5803025050 ↗
+              </a>
+            </div>
+          </div>
         </footer>
       </body>
     </html>
