@@ -44,14 +44,30 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               <span className="h-2 w-2 rounded-full bg-emerald-500/80" />
               <span>© 2026 YOHANNES MARCEL LALOPUA // UKWMS INFORMATICS</span>
             </div>
-            <div className="flex items-center gap-5 font-mono">
+            <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 font-mono">
               <a
                 href="https://github.com/MRMARCABLE"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-zinc-400 hover:text-zinc-100 transition"
               >
-                GITHUB/MRMARCABLE ↗
+                GITHUB ↗
+              </a>
+              <a
+                href="https://www.linkedin.com/in/yohannes-marcel-lalopua-8bb10b31b/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-400 hover:text-zinc-100 transition"
+              >
+                LINKEDIN ↗
+              </a>
+              <a
+                href="https://www.credly.com/users/yohannes-lalopua/badges"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-400 hover:text-zinc-100 transition"
+              >
+                CREDLY ↗
               </a>
               <a
                 href="https://git-eng.ukwms.ac.id/5803025050"
@@ -59,7 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 rel="noopener noreferrer"
                 className="text-zinc-400 hover:text-zinc-100 transition"
               >
-                GIT-ENG/5803025050 ↗
+                GIT-ENG ↗
               </a>
             </div>
           </div>
