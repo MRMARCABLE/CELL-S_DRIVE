@@ -91,21 +91,24 @@ export const focusDomains: FocusDomain[] = [
     code: "AI.AGENT",
     title: "Autonomous AI & Workflow Automation",
     desc: "Building autonomous AI agents and automated pipelines for operational audits, document retrieval, and smart workspace workflows using Langflow, IBM watsonx, Astra DB, and n8n.",
-    accent: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
+    accent:
+      "text-emerald-700 dark:text-emerald-300/90 border-[var(--border-soft)] bg-emerald-500/8",
   },
   {
     id: "02",
     code: "SYS.EMBED",
     title: "Embedded Systems & Computer Vision",
     desc: "Developing ESP32-based desktop robotics with 2-axis pan-tilt actuation and real-time face tracking powered by Python, OpenCV, and MediaPipe.",
-    accent: "text-amber-400 border-amber-500/30 bg-amber-500/10",
+    accent:
+      "text-amber-800 dark:text-amber-300/90 border-[var(--border-soft)] bg-amber-500/8",
   },
   {
     id: "03",
     code: "WEB.3D_UX",
     title: "Interactive 3D Web & UI/UX Engineering",
     desc: "Designing User-Centered Design (UCD) interfaces in Figma and interactive 3D mathematical visualizations in the browser with React, Next.js, and Three.js.",
-    accent: "text-sky-400 border-sky-500/30 bg-sky-500/10",
+    accent:
+      "text-sky-800 dark:text-sky-300/90 border-[var(--border-soft)] bg-sky-500/8",
   },
 ];
 
@@ -246,8 +249,9 @@ export const projects: ProjectItem[] = [
     category: "AI & Automation",
     status: "PROTOTYPE",
     year: "2026",
-    accent: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
-    borderHover: "hover:border-emerald-500/40",
+    accent:
+      "text-emerald-700 dark:text-emerald-300/90 border-[var(--border-soft)] bg-emerald-500/8",
+    borderHover: "",
     title: "ChiefOfStaff AI",
     desc: "Autonomous AI agent prototype built during the Hacktiv8 × IBM program for operational compliance auditing and workspace orchestration using Langflow, IBM watsonx, and Astra DB.",
     highlights: [
@@ -263,8 +267,9 @@ export const projects: ProjectItem[] = [
     category: "Embedded & Vision",
     status: "HARDWARE BUILD",
     year: "2026",
-    accent: "text-amber-400 border-amber-500/30 bg-amber-500/10",
-    borderHover: "hover:border-amber-500/40",
+    accent:
+      "text-amber-800 dark:text-amber-300/90 border-[var(--border-soft)] bg-amber-500/8",
+    borderHover: "",
     title: "Desktop Face-Tracking Robot",
     desc: "Desktop robotics assistant featuring a 2-axis pan-tilt mechanism and OLED display that tracks faces in real time through computer vision.",
     highlights: [
@@ -280,8 +285,9 @@ export const projects: ProjectItem[] = [
     category: "3D Web",
     status: "WEB APP",
     year: "2026",
-    accent: "text-violet-400 border-violet-500/30 bg-violet-500/10",
-    borderHover: "hover:border-violet-500/40",
+    accent:
+      "text-violet-800 dark:text-violet-300/90 border-[var(--border-soft)] bg-violet-500/8",
+    borderHover: "",
     title: "3D Math Vector Visualizer",
     desc: "Interactive browser application for visualizing 3D vector operations and surface mappings in real time.",
     highlights: [
@@ -297,8 +303,9 @@ export const projects: ProjectItem[] = [
     category: "UI/UX",
     status: "UCD RESEARCH",
     year: "2026",
-    accent: "text-sky-400 border-sky-500/30 bg-sky-500/10",
-    borderHover: "hover:border-sky-500/40",
+    accent:
+      "text-sky-800 dark:text-sky-300/90 border-[var(--border-soft)] bg-sky-500/8",
+    borderHover: "",
     title: "Smart Energy Monitoring UI/UX",
     desc: "User-Centered Design (UCD) interface prototype for a smart energy consumption monitoring application.",
     highlights: [
@@ -314,8 +321,9 @@ export const projects: ProjectItem[] = [
     category: "AI & Automation",
     status: "AUTOMATION",
     year: "2026",
-    accent: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
-    borderHover: "hover:border-emerald-500/40",
+    accent:
+      "text-emerald-700 dark:text-emerald-300/90 border-[var(--border-soft)] bg-emerald-500/8",
+    borderHover: "",
     title: "Telegram Expense Logger (n8n)",
     desc: "Automated personal expense tracking workflow connecting Telegram bot messages to structured spreadsheet logging via n8n.",
     highlights: [
@@ -331,8 +339,9 @@ export const projects: ProjectItem[] = [
     category: "AI & Automation",
     status: "RESEARCH",
     year: "2026",
-    accent: "text-emerald-400 border-emerald-500/30 bg-emerald-500/10",
-    borderHover: "hover:border-emerald-500/40",
+    accent:
+      "text-emerald-700 dark:text-emerald-300/90 border-[var(--border-soft)] bg-emerald-500/8",
+    borderHover: "",
     title: "Student Academic Performance Predictor",
     desc: "AI research project proposing predictive modeling for university student academic performance using structured behavioral and academic indicators.",
     highlights: [

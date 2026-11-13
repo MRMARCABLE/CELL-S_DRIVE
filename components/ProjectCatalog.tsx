@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { ProjectCategory, ProjectItem } from "@/data/portfolio";
+import { useLanguage } from "@/components/LanguageProvider";
+import type { ProjectCategory } from "@/data/portfolio";
 
 const categories: Array<"All" | ProjectCategory> = [
   "All",
@@ -11,25 +12,22 @@ const categories: Array<"All" | ProjectCategory> = [
   "UI/UX",
 ];
 
-export default function ProjectCatalog({
-  projects,
-}: {
-  projects: ProjectItem[];
-}) {
+export default function ProjectCatalog() {
+  const { t } = useLanguage();
   const [selectedCategory, setSelectedCategory] = useState<
     "All" | ProjectCategory
   >("All");
 
   const filteredProjects =
     selectedCategory === "All"
-      ? projects
-      : projects.filter((p) => p.category === selectedCategory);
+      ? t.projects
+      : t.projects.filter((p) => p.category === selectedCategory);
 
   return (
     <section className="space-y-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-zinc-800/80 pb-3">
-        <h2 className="font-mono text-xs tracking-wider text-zinc-400 uppercase">
-          02 // Featured Modules & Specifications
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--border-soft)] pb-3">
+        <h2 className="font-mono text-xs tracking-wider text-[var(--text-secondary)] uppercase">
+          {t.projectsPage.featuredHeading}
         </h2>
 
         <div
@@ -39,6 +37,11 @@ export default function ProjectCatalog({
         >
           {categories.map((category) => {
             const active = selectedCategory === category;
+            const label =
+              category === "All"
+                ? t.projectsPage.allCategory
+                : t.categoryLabels[category];
+
             return (
               <button
                 key={category}
@@ -46,13 +49,13 @@ export default function ProjectCatalog({
                 role="tab"
                 aria-selected={active}
                 onClick={() => setSelectedCategory(category)}
-                className={`rounded-md px-2.5 py-1 font-mono text-[11px] transition cursor-pointer ${
+                className={`rounded-md px-2.5 py-1 font-mono text-[11px] transition cursor-pointer border ${
                   active
-                    ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/40"
-                    : "text-zinc-400 border border-zinc-800 bg-zinc-900/40 hover:text-zinc-200 hover:border-zinc-700"
+                    ? "bg-[var(--accent-bg)] text-[var(--accent-text)] border-[var(--accent-border)]"
+                    : "text-[var(--text-secondary)] border-[var(--border-soft)] bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]"
                 }`}
               >
-                {category}
+                {label}
               </button>
             );
           })}
@@ -63,15 +66,17 @@ export default function ProjectCatalog({
         {filteredProjects.map((item) => (
           <article
             key={item.id}
-            className={`group rounded-xl border border-zinc-800/90 bg-zinc-900/30 p-6 transition flex flex-col justify-between space-y-6 hover:bg-zinc-900/60 ${item.borderHover}`}
+            className="soft-card soft-card-interactive group rounded-2xl p-6 flex flex-col justify-between space-y-6"
           >
             <div className="space-y-4">
               {/* Top Metadata Bar */}
-              <div className="flex items-center justify-between gap-2 border-b border-zinc-800/70 pb-3">
+              <div className="flex items-center justify-between gap-2 border-b border-[var(--border-soft)] pb-3">
                 <div className="flex items-center gap-2 font-mono text-xs">
-                  <span className="text-zinc-500">{item.id}</span>
-                  <span className="text-zinc-700">/</span>
-                  <span className="text-zinc-400">{item.code}</span>
+                  <span className="text-[var(--text-muted)]">{item.id}</span>
+                  <span className="text-[var(--border-hover)]">/</span>
+                  <span className="text-[var(--text-secondary)]">
+                    {item.code}
+                  </span>
                 </div>
                 <span
                   className={`rounded border px-2 py-0.5 font-mono text-[10px] ${item.accent}`}
@@ -82,10 +87,10 @@ export default function ProjectCatalog({
 
               {/* Title & Description */}
               <div className="space-y-2">
-                <h3 className="text-xl font-bold tracking-tight text-zinc-100 group-hover:text-white transition">
+                <h3 className="text-xl font-bold tracking-tight text-[var(--text-primary)] transition">
                   {item.title}
                 </h3>
-                <p className="text-sm text-zinc-400 leading-relaxed">
+                <p className="text-sm text-[var(--text-secondary)] leading-relaxed">
                   {item.desc}
                 </p>
               </div>
@@ -95,9 +100,11 @@ export default function ProjectCatalog({
                 {item.highlights.map((point) => (
                   <li
                     key={point}
-                    className="flex items-start gap-2 text-xs text-zinc-400"
+                    className="flex items-start gap-2 text-xs text-[var(--text-secondary)]"
                   >
-                    <span className="font-mono text-emerald-400 mt-0.5">›</span>
+                    <span className="font-mono text-[var(--accent-text)] mt-0.5">
+                      ›
+                    </span>
                     <span>{point}</span>
                   </li>
                 ))}
@@ -105,29 +112,29 @@ export default function ProjectCatalog({
             </div>
 
             {/* Footer: Tech Stack & Link */}
-            <div className="pt-4 border-t border-zinc-800/70 space-y-3">
+            <div className="pt-4 border-t border-[var(--border-soft)] space-y-3">
               <div className="flex flex-wrap gap-1.5">
-                {item.tech.map((t) => (
+                {item.tech.map((techName) => (
                   <span
-                    key={t}
-                    className="font-mono text-[11px] px-2.5 py-0.5 rounded border border-zinc-800 bg-zinc-950/80 text-zinc-300"
+                    key={techName}
+                    className="font-mono text-[11px] px-2.5 py-0.5 rounded border border-[var(--border-soft)] bg-[var(--bg-elevated)] text-[var(--text-secondary)]"
                   >
-                    {t}
+                    {techName}
                   </span>
                 ))}
               </div>
 
               <div className="flex items-center justify-between pt-1">
-                <span className="font-mono text-[11px] text-zinc-500">
-                  {`${item.category.toUpperCase()} // ${item.year}`}
+                <span className="font-mono text-[11px] text-[var(--text-muted)]">
+                  {`${t.categoryLabels[item.category].toUpperCase()} // ${item.year}`}
                 </span>
                 <a
                   href={item.repoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 font-mono text-xs text-zinc-300 hover:text-emerald-400 transition"
+                  className="inline-flex items-center gap-1 font-mono text-xs text-[var(--text-secondary)] hover:text-[var(--accent-text)] transition"
                 >
-                  <span>Explore Source</span>
+                  <span>{t.projectsPage.exploreSource}</span>
                   <span>↗</span>
                 </a>
               </div>
@@ -138,4 +145,3 @@ export default function ProjectCatalog({
     </section>
   );
 }
-

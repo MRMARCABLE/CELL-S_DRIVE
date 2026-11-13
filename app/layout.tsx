@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { LanguageProvider } from "@/components/LanguageProvider";
 import Navbar from "@/components/Navbar";
 import { profile } from "@/data/portfolio";
 
@@ -45,35 +46,52 @@ export const metadata: Metadata = {
   },
 };
 
+const themeInitScript = `
+  try {
+    var t = localStorage.getItem('theme');
+    if (t === 'light') document.documentElement.classList.remove('dark');
+    else document.documentElement.classList.add('dark');
+  } catch (e) {}
+`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
+      suppressHydrationWarning
+      className={`dark ${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
-      <body className="relative min-h-full flex flex-col bg-zinc-950 text-zinc-100 selection:bg-emerald-500/20 selection:text-emerald-300">
-        {/* Ambient top radial spotlight */}
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
+      <body className="relative min-h-full flex flex-col text-[var(--text-primary)] selection:bg-emerald-500/15 selection:text-[var(--accent-text)]">
+        {/* Atmospheric shadowy texture & grain */}
         <div
           aria-hidden="true"
-          className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-96 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(16,185,129,0.10),transparent)]"
+          className="ambient-backdrop pointer-events-none fixed inset-0 z-0"
+        />
+        <div
+          aria-hidden="true"
+          className="ambient-grain pointer-events-none fixed inset-0 z-0"
         />
 
-        <Navbar />
+        <LanguageProvider>
+          <Navbar />
 
-        <main className="flex-1 max-w-4xl w-full mx-auto px-6 py-12">
-          {children}
-        </main>
+          <main className="relative z-10 flex-1 max-w-4xl w-full mx-auto px-6 py-12">
+            {children}
+          </main>
 
-        <footer className="border-t border-zinc-800/80 bg-zinc-950/90 py-8">
-          <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
+          <footer className="relative z-10 border-t border-[var(--border-soft)] bg-[var(--bg-nav)] backdrop-blur-md py-8">
+          <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)]">
             <div className="flex items-center gap-2 font-mono">
-              <span className="h-2 w-2 rounded-full bg-emerald-500/80" />
+              <span className="h-2 w-2 rounded-full bg-[var(--accent-text)] opacity-75" />
               <span>© 2026 YOHANNES MARCEL LALOPUA // SURABAYA, ID</span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 font-mono">
               <a
                 href={`mailto:${profile.email}`}
-                className="text-zinc-400 hover:text-emerald-400 transition"
+                className="text-[var(--text-secondary)] hover:text-[var(--accent-text)] transition"
               >
                 EMAIL ↗
               </a>
@@ -81,7 +99,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 href={profile.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-400 hover:text-zinc-100 transition"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
               >
                 GITHUB ↗
               </a>
@@ -89,7 +107,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 href={profile.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-400 hover:text-zinc-100 transition"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
               >
                 LINKEDIN ↗
               </a>
@@ -97,7 +115,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 href={profile.credlyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-400 hover:text-zinc-100 transition"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
               >
                 CREDLY ↗
               </a>
@@ -105,13 +123,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 href={profile.gitEngUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-zinc-400 hover:text-zinc-100 transition"
+                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
               >
                 GIT-ENG ↗
               </a>
             </div>
           </div>
         </footer>
+        </LanguageProvider>
       </body>
     </html>
   );
