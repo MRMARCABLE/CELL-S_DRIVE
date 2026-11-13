@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import { profile } from "@/data/portfolio";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,19 +15,44 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Marca | Yohannes Marcel Lalopua — Portfolio",
+  title: {
+    default: "Marca | Yohannes Marcel Lalopua — Portfolio",
+    template: "%s | Yohannes Marcel Lalopua",
+  },
   description:
-    "Informatics Student at UKWMS — Web Development, UI/UX, AI Agents & Embedded Systems Portfolio",
+    "Informatics Student at UKWMS — Full-Stack Web Development, UI/UX (UCD), Autonomous AI Agents & Embedded Robotics Portfolio.",
+  openGraph: {
+    title: "Marca | Yohannes Marcel Lalopua — Portfolio",
+    description:
+      "Informatics Student at UKWMS — Web Development, UI/UX, AI Agents & Embedded Systems Portfolio.",
+    type: "website",
+    locale: "en_US",
+    images: [
+      {
+        url: profile.avatarUrl,
+        width: 460,
+        height: 460,
+        alt: "Yohannes Marcel Lalopua",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary",
+    title: "Marca | Yohannes Marcel Lalopua — Portfolio",
+    description:
+      "Informatics Student at UKWMS — Web Development, UI/UX, AI Agents & Embedded Systems.",
+    images: [profile.avatarUrl],
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
-      lang="id"
+      lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased scroll-smooth`}
     >
       <body className="relative min-h-full flex flex-col bg-zinc-950 text-zinc-100 selection:bg-emerald-500/20 selection:text-emerald-300">
-        {/* Ambient top radial spotlight inspired by ArtCraft */}
+        {/* Ambient top radial spotlight */}
         <div
           aria-hidden="true"
           className="pointer-events-none fixed inset-x-0 top-0 -z-10 h-96 bg-[radial-gradient(ellipse_60%_50%_at_50%_-10%,rgba(16,185,129,0.10),transparent)]"
@@ -42,11 +68,17 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-500">
             <div className="flex items-center gap-2 font-mono">
               <span className="h-2 w-2 rounded-full bg-emerald-500/80" />
-              <span>© 2026 YOHANNES MARCEL LALOPUA // UKWMS INFORMATICS</span>
+              <span>© 2026 YOHANNES MARCEL LALOPUA // SURABAYA, ID</span>
             </div>
             <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 font-mono">
               <a
-                href="https://github.com/MRMARCABLE"
+                href={`mailto:${profile.email}`}
+                className="text-zinc-400 hover:text-emerald-400 transition"
+              >
+                EMAIL ↗
+              </a>
+              <a
+                href={profile.githubUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-zinc-400 hover:text-zinc-100 transition"
@@ -54,7 +86,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 GITHUB ↗
               </a>
               <a
-                href="https://www.linkedin.com/in/yohannes-marcel-lalopua-8bb10b31b/"
+                href={profile.linkedinUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-zinc-400 hover:text-zinc-100 transition"
@@ -62,7 +94,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 LINKEDIN ↗
               </a>
               <a
-                href="https://www.credly.com/users/yohannes-lalopua/badges"
+                href={profile.credlyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-zinc-400 hover:text-zinc-100 transition"
@@ -70,7 +102,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 CREDLY ↗
               </a>
               <a
-                href="https://git-eng.ukwms.ac.id/5803025050"
+                href={profile.gitEngUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-zinc-400 hover:text-zinc-100 transition"
