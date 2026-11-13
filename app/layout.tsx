@@ -51,6 +51,8 @@ const themeInitScript = `
     var t = localStorage.getItem('theme');
     if (t === 'light') document.documentElement.classList.remove('dark');
     else document.documentElement.classList.add('dark');
+    var l = localStorage.getItem('locale');
+    if (l === 'id' || l === 'en') document.documentElement.lang = l;
   } catch (e) {}
 `;
 
