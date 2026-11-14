@@ -1,13 +1,18 @@
 export interface FocusDomain {
   id: string;
   code: string;
+  suit: "♦" | "♣" | "♠";
+  rgb: "r" | "g" | "b";
   title: string;
   desc: string;
+  highlights: string[];
   accent: string;
 }
 
 export interface ExperienceItem {
   id: string;
+  hash: string;
+  branch: string;
   role: string;
   organization: string;
   period: string;
@@ -18,13 +23,18 @@ export interface ExperienceItem {
 
 export interface EducationItem {
   id: string;
+  hash: string;
+  branch: string;
   institution: string;
   degree: string;
   period: string;
   note: string;
+  skills: string[];
 }
 
 export interface TechCategory {
+  id: string;
+  busCode: string;
   category: string;
   items: string[];
 }
@@ -89,24 +99,33 @@ export const focusDomains: FocusDomain[] = [
   {
     id: "01",
     code: "AI.AGENT",
+    suit: "♦",
+    rgb: "r",
     title: "Autonomous AI & Workflow Automation",
     desc: "Building autonomous AI agents and automated pipelines for operational audits, document retrieval, and smart workspace workflows using Langflow, IBM watsonx, Astra DB, and n8n.",
+    highlights: ["Langflow & IBM watsonx", "Vector RAG (Astra DB)", "n8n Event Pipelines"],
     accent:
-      "text-emerald-700 dark:text-emerald-300/90 border-[var(--border-soft)] bg-emerald-500/8",
+      "text-rose-700 dark:text-rose-300/90 border-[var(--border-soft)] bg-rose-500/8",
   },
   {
     id: "02",
     code: "SYS.EMBED",
+    suit: "♣",
+    rgb: "g",
     title: "Embedded Systems & Computer Vision",
     desc: "Developing ESP32-based desktop robotics with 2-axis pan-tilt actuation and real-time face tracking powered by Python, OpenCV, and MediaPipe.",
+    highlights: ["ESP32 2-Axis Actuation", "OpenCV & MediaPipe", "Serial Hardware Telemetry"],
     accent:
-      "text-amber-800 dark:text-amber-300/90 border-[var(--border-soft)] bg-amber-500/8",
+      "text-emerald-700 dark:text-emerald-300/90 border-[var(--border-soft)] bg-emerald-500/8",
   },
   {
     id: "03",
     code: "WEB.3D_UX",
+    suit: "♠",
+    rgb: "b",
     title: "Interactive 3D Web & UI/UX Engineering",
     desc: "Designing User-Centered Design (UCD) interfaces in Figma and interactive 3D mathematical visualizations in the browser with React, Next.js, and Three.js.",
+    highlights: ["Next.js & React Architecture", "Three.js 3D Space", "Figma UCD Systems"],
     accent:
       "text-sky-800 dark:text-sky-300/90 border-[var(--border-soft)] bg-sky-500/8",
   },
@@ -115,6 +134,8 @@ export const focusDomains: FocusDomain[] = [
 export const experiences: ExperienceItem[] = [
   {
     id: "01",
+    hash: "a9c4f12",
+    branch: "feat/fiesto-web",
     role: "Creative Team & Web Developer Intern",
     organization: "Fiesto",
     period: "Mar 2023 · 6 Months",
@@ -125,6 +146,8 @@ export const experiences: ExperienceItem[] = [
   },
   {
     id: "02",
+    hash: "c3e81b4",
+    branch: "org/hippast-sec",
     role: "Secretary",
     organization: "HIPPAST St. Louis",
     period: "Feb 2023",
@@ -135,6 +158,8 @@ export const experiences: ExperienceItem[] = [
   },
   {
     id: "03",
+    hash: "7d2b09e",
+    branch: "ops/cls-broadcast",
     role: "Camera Crew & Livestreaming Operator Intern",
     organization: "Fiesto — CLS CUP International",
     period: "Dec 2022",
@@ -148,22 +173,30 @@ export const experiences: ExperienceItem[] = [
 export const education: EducationItem[] = [
   {
     id: "01",
+    hash: "f580302",
+    branch: "main/ukwms-informatics",
     institution: "Universitas Katolik Widya Mandala Surabaya (UKWMS)",
     degree: "B.Sc. in Informatics (Teknik Informatika)",
     period: "2025 — Present",
     note: "Focusing on Web Engineering, Artificial Intelligence, Computer Vision, and Embedded Systems.",
+    skills: ["Web Engineering", "AI & Vision", "Embedded Systems", "NRP 5803025050"],
   },
   {
     id: "02",
+    hash: "4b19d0a",
+    branch: "edu/stlouis-multimedia",
     institution: "SMK St. Louis Surabaya",
     degree: "Vocational High School — Multimedia",
     period: "2021 — 2024",
     note: "Built a strong foundation in visual design, UI/UX prototyping, digital media production, and frontend basics.",
+    skills: ["Multimedia Production", "Visual Design", "UI/UX Prototyping"],
   },
 ];
 
 export const techCategories: TechCategory[] = [
   {
+    id: "BUS_01",
+    busCode: "BUS // WEB_ARCH",
     category: "Web & Frontend Architecture",
     items: [
       "Next.js (App Router)",
@@ -174,10 +207,14 @@ export const techCategories: TechCategory[] = [
     ],
   },
   {
+    id: "BUS_02",
+    busCode: "BUS // AI_VISION",
     category: "AI, Automation & Vision",
     items: ["Python", "Langflow", "Astra DB", "n8n", "OpenCV", "MediaPipe"],
   },
   {
+    id: "BUS_03",
+    busCode: "BUS // HW_DESIGN",
     category: "Hardware, Design & Tooling",
     items: ["ESP32 / IoT", "UI/UX Design (UCD)", "Figma", "Git & GitLab"],
   },

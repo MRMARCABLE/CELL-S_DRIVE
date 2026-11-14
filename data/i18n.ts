@@ -5,6 +5,7 @@ import type {
   FocusDomain,
   ProjectCategory,
   ProjectItem,
+  TechCategory,
 } from "@/data/portfolio";
 import {
   certificates as baseCertificates,
@@ -13,6 +14,7 @@ import {
   focusDomains as baseFocusDomains,
   profile,
   projects as baseProjects,
+  techCategories as baseTechCategories,
 } from "@/data/portfolio";
 
 export type Locale = "en" | "id";
@@ -21,6 +23,25 @@ export interface LocalizedContent {
   nav: {
     overview: string;
     projects: string;
+  };
+  quotes: {
+    chaosStar: string;
+    sufferCreation: string;
+    neverHalfHearted: string;
+  };
+  boot: {
+    skipLabel: string;
+    initializing: string;
+  };
+  sceneUi: {
+    revealAllCards: string;
+    hideAllCards: string;
+    tapToFlip: string;
+    inspectCommit: string;
+    filterBusAll: string;
+    inspectBadge: string;
+    cliPlaceholder: string;
+    cliHint: string;
   };
   hero: {
     sectionLabel: string;
@@ -67,6 +88,7 @@ export interface LocalizedContent {
   focusDomains: FocusDomain[];
   experiences: ExperienceItem[];
   education: EducationItem[];
+  techCategories: TechCategory[];
   certificates: CertificateItem[];
   projects: ProjectItem[];
 }
@@ -76,6 +98,28 @@ export const translations: Record<Locale, LocalizedContent> = {
     nav: {
       overview: "Overview",
       projects: "Projects",
+    },
+    quotes: {
+      chaosStar:
+        "One must still have chaos in oneself to be able to give birth to a dancing star.",
+      sufferCreation: "Suffer in creation, endure in memory.",
+      neverHalfHearted:
+        "I was here — and the world will never be the same, because I chose not to live half-heartedly.",
+    },
+    boot: {
+      skipLabel: "Skip Intro [ESC]",
+      initializing: "CALIBRATING CHAOS MATRIX // NRP 5803025050",
+    },
+    sceneUi: {
+      revealAllCards: "Reveal All Cards",
+      hideAllCards: "Reset Deck",
+      tapToFlip: "Click or hover card to flip",
+      inspectCommit: "Select a commit node to inspect details",
+      filterBusAll: "ALL BUSES ACTIVE",
+      inspectBadge: "CREDENTIAL INSPECTOR // SELECT EMBLEM",
+      cliPlaceholder: "Type 'help', 'neofetch', 'quote', 'chaos', or '1'..'5'...",
+      cliHint:
+        "Interactive shell — try: help · neofetch · sudo hire marcel · quote · chaos · clear",
     },
     hero: {
       sectionLabel: "01 // DEVELOPER PROFILE",
@@ -131,6 +175,7 @@ export const translations: Record<Locale, LocalizedContent> = {
     focusDomains: baseFocusDomains,
     experiences: baseExperiences,
     education: baseEducation,
+    techCategories: baseTechCategories,
     certificates: baseCertificates,
     projects: baseProjects,
   },
@@ -138,6 +183,29 @@ export const translations: Record<Locale, LocalizedContent> = {
     nav: {
       overview: "Ringkasan",
       projects: "Proyek",
+    },
+    quotes: {
+      chaosStar:
+        "Seseorang harus memiliki kekacauan di dalam dirinya untuk bisa melahirkan bintang yang menari.",
+      sufferCreation: "Menderita dalam Ciptaan, Abadi dalam Ingatan.",
+      neverHalfHearted:
+        "Aku pernah ada di sini, dan dunia tidak akan pernah sama lagi karena aku memilih untuk tidak hidup dengan setengah hati.",
+    },
+    boot: {
+      skipLabel: "Lewati Intro [ESC]",
+      initializing: "MENGKALIBRASI MATRIKS KEKACAUAN // NRP 5803025050",
+    },
+    sceneUi: {
+      revealAllCards: "Buka Semua Kartu",
+      hideAllCards: "Tutup Dek",
+      tapToFlip: "Klik atau arahkan kursor untuk membalik kartu",
+      inspectCommit: "Pilih node commit untuk melihat detail",
+      filterBusAll: "SEMUA BUS AKTIF",
+      inspectBadge: "INSPEKTOR KREDENSIAL // PILIH LENCANA",
+      cliPlaceholder:
+        "Ketik 'help', 'neofetch', 'quote', 'chaos', atau '1'..'5'...",
+      cliHint:
+        "Shell interaktif — coba: help · neofetch · sudo hire marcel · quote · chaos · clear",
     },
     hero: {
       sectionLabel: "01 // PROFIL PENGEMBANG",
@@ -197,16 +265,31 @@ export const translations: Record<Locale, LocalizedContent> = {
         ...baseFocusDomains[0],
         title: "AI Otonom & Otomasi Alur Kerja",
         desc: "Membangun agen AI otonom dan pipeline otomatis untuk audit operasional, pencarian dokumen, serta integrasi workspace cerdas menggunakan Langflow, IBM watsonx, Astra DB, dan n8n.",
+        highlights: [
+          "Langflow & IBM watsonx",
+          "Vector RAG (Astra DB)",
+          "Pipeline Event n8n",
+        ],
       },
       {
         ...baseFocusDomains[1],
         title: "Sistem Tertanam & Visi Komputer",
         desc: "Mengembangkan robotika meja berbasis ESP32 dengan mekanisme pan-tilt 2-axis dan pelacakan wajah real-time menggunakan Python, OpenCV, dan MediaPipe.",
+        highlights: [
+          "Aktuasi 2-Axis ESP32",
+          "OpenCV & MediaPipe",
+          "Telemetri Perangkat Keras Serial",
+        ],
       },
       {
         ...baseFocusDomains[2],
         title: "Web 3D Interaktif & Rekayasa UI/UX",
         desc: "Merancang antarmuka berbasis User-Centered Design (UCD) di Figma serta visualisasi matematis 3D interaktif di browser menggunakan React, Next.js, dan Three.js.",
+        highlights: [
+          "Arsitektur Next.js & React",
+          "Ruang 3D Three.js",
+          "Sistem UCD Figma",
+        ],
       },
     ],
     experiences: [
@@ -246,6 +329,20 @@ export const translations: Record<Locale, LocalizedContent> = {
         ...baseEducation[1],
         degree: "SMK — Jurusan Multimedia",
         note: "Membangun dasar kuat dalam desain visual, prototipe UI/UX, produksi media digital, dan dasar pengembangan frontend.",
+      },
+    ],
+    techCategories: [
+      {
+        ...baseTechCategories[0],
+        category: "Arsitektur Web & Frontend",
+      },
+      {
+        ...baseTechCategories[1],
+        category: "AI, Otomasi & Visi Komputer",
+      },
+      {
+        ...baseTechCategories[2],
+        category: "Perangkat Keras, Desain & Perkakas",
       },
     ],
     certificates: [

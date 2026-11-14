@@ -19,6 +19,27 @@
   --accent-border: rgba(47, 111, 94, 0.16);
   --shadow-card: 0 1px 2px rgba(28, 25, 23, 0.04), 0 8px 24px -12px rgba(28, 25, 23, 0.08);
   --shadow-card-hover: 0 4px 12px rgba(28, 25, 23, 0.06), 0 14px 32px -12px rgba(28, 25, 23, 0.12);
+
+  /* Contextual Scene Silhouette RGB (Light = Soft Pastel Tint) */
+  --scene-glow-1: 47, 111, 94;
+  --scene-glow-2: 99, 102, 241;
+  --scene-opacity: 0.09;
+
+  /* Playing Card RGB Tokens (Light = Soft Tinted) */
+  --rgb-r-border: rgba(225, 29, 72, 0.28);
+  --rgb-r-bg: rgba(244, 63, 94, 0.07);
+  --rgb-r-text: #be123c;
+  --rgb-r-glow: 0 10px 30px -10px rgba(225, 29, 72, 0.18);
+
+  --rgb-g-border: rgba(5, 150, 105, 0.28);
+  --rgb-g-bg: rgba(16, 185, 129, 0.07);
+  --rgb-g-text: #047857;
+  --rgb-g-glow: 0 10px 30px -10px rgba(5, 150, 105, 0.18);
+
+  --rgb-b-border: rgba(2, 132, 199, 0.28);
+  --rgb-b-bg: rgba(14, 165, 233, 0.07);
+  --rgb-b-text: #0369a1;
+  --rgb-b-glow: 0 10px 30px -10px rgba(2, 132, 199, 0.18);
 }
 
 .dark {
@@ -38,6 +59,62 @@
   --accent-border: rgba(126, 200, 176, 0.16);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.25), 0 10px 30px -14px rgba(0, 0, 0, 0.55);
   --shadow-card-hover: 0 4px 14px rgba(0, 0, 0, 0.32), 0 16px 38px -12px rgba(0, 0, 0, 0.68);
+
+  /* Contextual Scene Silhouette RGB (Dark = Neony Cyber Glow) */
+  --scene-glow-1: 126, 200, 176;
+  --scene-glow-2: 56, 189, 248;
+  --scene-opacity: 0.13;
+
+  /* Playing Card RGB Tokens (Dark = Neony Glow) */
+  --rgb-r-border: rgba(251, 113, 133, 0.55);
+  --rgb-r-bg: rgba(244, 63, 94, 0.11);
+  --rgb-r-text: #fda4af;
+  --rgb-r-glow: 0 0 28px -4px rgba(244, 63, 94, 0.38), inset 0 0 18px rgba(244, 63, 94, 0.08);
+
+  --rgb-g-border: rgba(52, 211, 153, 0.55);
+  --rgb-g-bg: rgba(16, 185, 129, 0.11);
+  --rgb-g-text: #6ee7b7;
+  --rgb-g-glow: 0 0 28px -4px rgba(16, 185, 129, 0.38), inset 0 0 18px rgba(16, 185, 129, 0.08);
+
+  --rgb-b-border: rgba(56, 189, 248, 0.55);
+  --rgb-b-bg: rgba(14, 165, 233, 0.11);
+  --rgb-b-text: #7dd3fc;
+  --rgb-b-glow: 0 0 28px -4px rgba(14, 165, 233, 0.38), inset 0 0 18px rgba(14, 165, 233, 0.08);
+}
+
+/* Per-Scene Contextual Silhouette Palette (01 -> 06) */
+html[data-scene="01"] {
+  --scene-glow-1: 220, 230, 242;
+  --scene-glow-2: 126, 200, 176;
+}
+html:not(.dark)[data-scene="01"] {
+  --scene-glow-1: 47, 111, 94;
+  --scene-glow-2: 100, 116, 139;
+}
+
+html[data-scene="02"] {
+  --scene-glow-1: 244, 63, 94;
+  --scene-glow-2: 14, 165, 233;
+}
+
+html[data-scene="03"] {
+  --scene-glow-1: 245, 158, 11;
+  --scene-glow-2: 217, 119, 6;
+}
+
+html[data-scene="04"] {
+  --scene-glow-1: 6, 182, 212;
+  --scene-glow-2: 59, 130, 246;
+}
+
+html[data-scene="05"] {
+  --scene-glow-1: 234, 179, 8;
+  --scene-glow-2: 16, 185, 129;
+}
+
+html[data-scene="06"] {
+  --scene-glow-1: 16, 185, 129;
+  --scene-glow-2: 34, 197, 94;
 }
 
 @theme inline {
@@ -59,20 +136,138 @@ body {
   transition: color 220ms ease;
 }
 
-/* Soft atmospheric shadowy texture */
+/* Soft atmospheric shadowy texture + contextual scene silhouette */
 .ambient-backdrop {
   background-image:
-    radial-gradient(ellipse 75% 45% at 50% -12%, rgba(126, 200, 176, 0.08), transparent 70%),
-    radial-gradient(ellipse 55% 40% at 15% 25%, rgba(120, 130, 160, 0.06), transparent 65%),
-    radial-gradient(ellipse 50% 45% at 85% 70%, rgba(140, 125, 110, 0.05), transparent 65%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(var(--scene-glow-1), var(--scene-opacity)), transparent 70%),
+    radial-gradient(ellipse 60% 45% at 12% 30%, rgba(var(--scene-glow-1), calc(var(--scene-opacity) * 0.75)), transparent 65%),
+    radial-gradient(ellipse 60% 50% at 88% 75%, rgba(var(--scene-glow-2), calc(var(--scene-opacity) * 0.8)), transparent 65%);
+  transition: background-image 700ms ease, opacity 700ms ease;
 }
 
 .dark .ambient-backdrop {
   background-image:
-    radial-gradient(ellipse 75% 45% at 50% -10%, rgba(126, 200, 176, 0.07), transparent 70%),
-    radial-gradient(ellipse 55% 40% at 12% 28%, rgba(99, 115, 155, 0.08), transparent 65%),
-    radial-gradient(ellipse 55% 45% at 88% 72%, rgba(65, 78, 95, 0.09), transparent 65%),
-    radial-gradient(circle at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.35) 100%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(var(--scene-glow-1), var(--scene-opacity)), transparent 70%),
+    radial-gradient(ellipse 60% 45% at 12% 30%, rgba(var(--scene-glow-1), calc(var(--scene-opacity) * 0.7)), transparent 65%),
+    radial-gradient(ellipse 60% 50% at 88% 75%, rgba(var(--scene-glow-2), calc(var(--scene-opacity) * 0.85)), transparent 65%),
+    radial-gradient(circle at 50% 50%, transparent 45%, rgba(0, 0, 0, 0.42) 100%);
+}
+
+/* Full-Viewport Scene Stage */
+.scene-stage {
+  min-height: calc(100dvh - 4.5rem);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+  position: relative;
+}
+
+/* Blinking Terminal Block Cursor */
+@keyframes terminal-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+.cursor-blink {
+  display: inline-block;
+  width: 0.55em;
+  height: 1.05em;
+  vertical-align: -0.15em;
+  background-color: var(--accent-text);
+  animation: terminal-blink 1.05s steps(1) infinite;
+}
+
+/* 3D Playing Card (5:7) Flip Mechanics */
+.playing-card-perspective {
+  perspective: 1200px;
+}
+
+.playing-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms ease;
+}
+
+.playing-card-perspective:hover .playing-card-inner,
+.playing-card-perspective:focus-visible .playing-card-inner,
+.playing-card-perspective[data-open="true"] .playing-card-inner {
+  transform: rotateY(180deg);
+}
+
+.playing-card-face,
+.playing-card-back {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 1rem;
+}
+
+.playing-card-back {
+  transform: rotateY(180deg);
+}
+
+.rgb-card-r {
+  border: 1px solid var(--rgb-r-border);
+  background-color: var(--rgb-r-bg);
+  box-shadow: var(--rgb-r-glow);
+  color: var(--rgb-r-text);
+}
+
+.rgb-card-g {
+  border: 1px solid var(--rgb-g-border);
+  background-color: var(--rgb-g-bg);
+  box-shadow: var(--rgb-g-glow);
+  color: var(--rgb-g-text);
+}
+
+.rgb-card-b {
+  border: 1px solid var(--rgb-b-border);
+  background-color: var(--rgb-b-bg);
+  box-shadow: var(--rgb-b-glow);
+  color: var(--rgb-b-text);
+}
+
+/* Holographic Badge Glint */
+.holo-badge {
+  position: relative;
+  overflow: hidden;
+}
+
+.holo-badge::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(
+    115deg,
+    transparent 35%,
+    rgba(126, 200, 176, 0.22) 45%,
+    rgba(250, 204, 21, 0.24) 50%,
+    rgba(56, 189, 248, 0.22) 55%,
+    transparent 65%
+  );
+  transform: translateX(-100%) rotate(12deg);
+  transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+.holo-badge:hover::after,
+.holo-badge[data-active="true"]::after {
+  transform: translateX(100%) rotate(12deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .playing-card-inner,
+  .holo-badge::after {
+    transition: none !important;
+  }
+  .cursor-blink {
+    animation: none !important;
+  }
 }
 
 .ambient-grain {
