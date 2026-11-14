@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
@@ -8,8 +7,6 @@ import ScenePrompt from "@/components/home/ScenePrompt";
 import AsciiPortrait from "@/components/home/fx/AsciiPortrait";
 import { useReducedMotion } from "@/components/home/fx/hooks/useReducedMotion";
 import { useScrollProgress } from "@/components/home/fx/hooks/useScrollProgress";
-import { playSfx } from "@/components/shell/sound";
-import { asciiPortraitDesktop } from "@/data/ascii-portrait";
 import { profile } from "@/data/portfolio";
 
 const SCRAMBLE_FRAMES = ["M4RC3L", "010101", "M✦RCEL", "MARC3L", "MARCEL"];
@@ -20,19 +17,9 @@ export default function IdentityScene() {
   const scrollProgress = useScrollProgress("scene-01");
   const [nameLabel, setNameLabel] = useState("MARCEL");
   const [scrambling, setScrambling] = useState(false);
-  const [asciiSettled, setAsciiSettled] = useState(false);
-  const [asciiOnlyMode, setAsciiOnlyMode] = useState(false);
 
   const stageRef = useRef<HTMLDivElement | null>(null);
   const spotlightRef = useRef<HTMLDivElement | null>(null);
-
-  // Gradually fade the ASCII layer evenly into the background & right-hand portrait after mount
-  useEffect(() => {
-    const id = window.setTimeout(() => {
-      setAsciiSettled(true);
-    }, 450);
-    return () => window.clearTimeout(id);
-  }, []);
 
   useEffect(() => {
     if (!scrambling || reducedMotion) return;
@@ -99,19 +86,6 @@ export default function IdentityScene() {
         command="whoami --profile"
         subtitle={t.hero.sectionLabel}
         badge={`STATUS: ${t.hero.availability}`}
-        rightSlot={
-          <button
-            type="button"
-            onClick={() => {
-              playSfx("key");
-              setAsciiOnlyMode((prev) => !prev);
-            }}
-            data-cursor="decrypt"
-            className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 font-mono text-[11px] text-[var(--text-secondary)] hover:border-[var(--accent-border)] hover:text-[var(--accent-text)] transition cursor-pointer"
-          >
-            {asciiOnlyMode ? t.sceneUi.revealPhotoBtn : t.sceneUi.asciiMaskBtn}
-          </button>
-        }
       />
 
       <div
@@ -121,8 +95,8 @@ export default function IdentityScene() {
         onMouseLeave={handleStageMouseLeave}
         className="soft-card relative flex-1 flex flex-col justify-between overflow-hidden rounded-3xl p-6 sm:p-9 lg:p-12 transition-transform duration-150 will-change-transform"
       >
-        {/* Full-Section Ambient ASCII Background that gradually fades evenly across the stage */}
-        <AsciiPortrait settled={asciiSettled} asciiFocus={asciiOnlyMode} />
+        {/* Right-Corner Half-Visible Proportional ASCII GitHub Background (No Raw Image) */}
+        <AsciiPortrait />
 
         {/* Cursor Radial Spotlight illuminating the ASCII background */}
         <div
@@ -131,165 +105,56 @@ export default function IdentityScene() {
           className="pointer-events-none absolute inset-0 z-[1] opacity-0 transition-opacity duration-300"
           style={{
             background:
-              "radial-gradient(circle 220px at var(--spot-x, 70%) var(--spot-y, 50%), rgba(var(--scene-glow-1), 0.16), transparent 72%)",
+              "radial-gradient(circle 240px at var(--spot-x, 78%) var(--spot-y, 50%), rgba(var(--scene-glow-1), 0.18), transparent 72%)",
           }}
         />
 
-        {/* Main Hero Grid: Left Focal Typography + Right Proportioned Blended Portrait */}
-        <div className="relative z-10 my-auto grid items-center gap-8 lg:grid-cols-12 py-2">
-          {/* Left Column: Giant Stacked Name + Bio + Philosophical Quote */}
-          <div className="lg:col-span-7 space-y-6">
-            <div className="flex flex-wrap items-center gap-2.5">
-              <span className="inline-flex items-center gap-2 rounded-md border border-[var(--accent-border)] bg-[var(--accent-bg)] px-2.5 py-1 font-mono text-xs text-[var(--accent-text)]">
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-text)]" />
-                <span>{t.hero.roleBadge}</span>
-              </span>
-              <span className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)]/90 px-2.5 py-1 font-mono text-xs text-[var(--text-muted)]">
-                NRP // 5803025050
-              </span>
-            </div>
-
-            {/* Giant Stacked Focal Name */}
-            <h1
-              aria-label={profile.name}
-              onMouseEnter={() => {
-                if (!reducedMotion && !scrambling) setScrambling(true);
-              }}
-              className="font-sans text-[clamp(2.5rem,6.2vw,5.1rem)] font-extrabold uppercase leading-[0.92] tracking-tighter text-[var(--text-primary)] select-none"
-            >
-              <span className="block">YOHANNES</span>
-              <span className="block text-[var(--accent-text)] transition-colors">
-                {nameLabel}
-              </span>
-              <span className="block">LALOPUA</span>
-            </h1>
-
-            <p className="max-w-2xl text-sm sm:text-base leading-relaxed text-[var(--text-secondary)]">
-              {t.hero.bio}
-            </p>
-
-            {/* Philosophical Quote 1 (No attribution) */}
-            <blockquote className="max-w-xl rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/80 backdrop-blur-sm px-4 py-3 font-mono text-xs sm:text-[13px] leading-relaxed text-[var(--text-secondary)]">
-              <span
-                className="mr-2 text-[var(--accent-text)]"
-                aria-hidden="true"
-              >
-                ✦
-              </span>
-              <span className="italic text-[var(--text-primary)]">
-                {`“${t.quotes.chaosStar}”`}
-              </span>
-            </blockquote>
+        {/* Main Hero Content overlaid on top of the right-anchored fading ASCII background */}
+        <div className="relative z-10 my-auto max-w-3xl space-y-6 py-4">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <span className="inline-flex items-center gap-2 rounded-md border border-[var(--accent-border)] bg-[var(--bg-bg,var(--accent-bg))] px-2.5 py-1 font-mono text-xs text-[var(--accent-text)]">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-text)]" />
+              <span>{t.hero.roleBadge}</span>
+            </span>
+            <span className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)]/90 px-2.5 py-1 font-mono text-xs text-[var(--text-muted)]">
+              NRP // 5803025050
+            </span>
+            <span className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)]/90 px-2.5 py-1 font-mono text-xs text-[var(--accent-text)]">
+              @MRMARCABLE // {t.sceneUi.verifiedIdentity}
+            </span>
           </div>
 
-          {/* Right Column: Proportioned Portrait seamlessly blended with the ASCII background */}
-          <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
-            <div
-              role="button"
-              tabIndex={0}
-              aria-pressed={asciiOnlyMode}
-              aria-label={
-                asciiOnlyMode ? t.sceneUi.revealPhotoBtn : t.sceneUi.asciiMaskBtn
-              }
-              data-cursor="decrypt"
-              onClick={() => {
-                playSfx("key");
-                setAsciiOnlyMode((prev) => !prev);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  playSfx("key");
-                  setAsciiOnlyMode((prev) => !prev);
-                }
-              }}
-              className="group/portrait relative w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[350px] cursor-pointer focus:outline-none"
+          {/* Giant Stacked Focal Name */}
+          <h1
+            aria-label={profile.name}
+            onMouseEnter={() => {
+              if (!reducedMotion && !scrambling) setScrambling(true);
+            }}
+            className="font-sans text-[clamp(2.6rem,6.8vw,5.4rem)] font-extrabold uppercase leading-[0.92] tracking-tighter text-[var(--text-primary)] select-none"
+          >
+            <span className="block">YOHANNES</span>
+            <span className="block text-[var(--accent-text)] transition-colors">
+              {nameLabel}
+            </span>
+            <span className="block">LALOPUA</span>
+          </h1>
+
+          <p className="max-w-2xl text-sm sm:text-base leading-relaxed text-[var(--text-secondary)]">
+            {t.hero.bio}
+          </p>
+
+          {/* Philosophical Quote 1 (No attribution) */}
+          <blockquote className="max-w-xl rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/80 backdrop-blur-sm px-4 py-3 font-mono text-xs sm:text-[13px] leading-relaxed text-[var(--text-secondary)]">
+            <span
+              className="mr-2 text-[var(--accent-text)]"
+              aria-hidden="true"
             >
-              {/* Soft outer ambient glow syncing the portrait with the ASCII field */}
-              <div
-                aria-hidden="true"
-                className="pointer-events-none absolute -inset-3 rounded-3xl opacity-55 blur-2xl transition-opacity duration-700 group-hover/portrait:opacity-80"
-                style={{
-                  background:
-                    "radial-gradient(circle at 50% 45%, rgba(var(--scene-glow-1), 0.25), transparent 72%)",
-                }}
-              />
-
-              {/* Proportioned 4:5 Portrait Frame */}
-              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/70 shadow-xl backdrop-blur-sm">
-                {/* Real Proportioned Photo (/avatar.png) */}
-                <Image
-                  src="/avatar.png"
-                  alt={`Portrait of ${profile.name}`}
-                  fill
-                  priority
-                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 350px"
-                  style={{
-                    maskImage:
-                      "radial-gradient(ellipse 92% 92% at 50% 46%, black 58%, rgba(0,0,0,0.65) 82%, transparent 100%)",
-                    WebkitMaskImage:
-                      "radial-gradient(ellipse 92% 92% at 50% 46%, black 58%, rgba(0,0,0,0.65) 82%, transparent 100%)",
-                  }}
-                  className={`object-cover object-center transition-all duration-[1400ms] ease-out group-hover/portrait:scale-[1.02] ${
-                    asciiOnlyMode
-                      ? "opacity-15 scale-95 blur-[1px]"
-                      : asciiSettled
-                        ? "opacity-95 scale-100"
-                        : "opacity-25 scale-[0.98]"
-                  }`}
-                />
-
-                {/* Overlaid ASCII Veil that gradually fades evenly into the photo */}
-                <div
-                  aria-hidden="true"
-                  style={{
-                    maskImage:
-                      "radial-gradient(ellipse 95% 90% at 50% 50%, black 45%, transparent 98%)",
-                    WebkitMaskImage:
-                      "radial-gradient(ellipse 95% 90% at 50% 50%, black 45%, transparent 98%)",
-                  }}
-                  className={`pointer-events-none absolute inset-0 flex items-center justify-center p-2 font-mono transition-opacity duration-[1500ms] ease-out ${
-                    asciiOnlyMode
-                      ? "opacity-95"
-                      : asciiSettled
-                        ? "opacity-20 group-hover/portrait:opacity-35"
-                        : "opacity-85"
-                  }`}
-                >
-                  <pre className="text-[6.8px] sm:text-[7.5px] leading-[1.05] tracking-[0.03em] text-[var(--accent-text)]">
-                    {asciiPortraitDesktop.join("\n")}
-                  </pre>
-                </div>
-
-                {/* Soft Bottom & Edge Gradient Blending */}
-                <div
-                  aria-hidden="true"
-                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)] via-transparent to-transparent opacity-85"
-                />
-
-                {/* Floating Verified Identity Bar inside the bottom of the portrait */}
-                <div className="absolute inset-x-3 bottom-3 z-10 flex items-center justify-between gap-2 rounded-2xl border border-[var(--border-soft)] bg-[var(--bg-surface)]/90 px-3.5 py-2.5 backdrop-blur-md shadow-sm">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <span
-                      title={t.hero.availability}
-                      className="h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--accent-text)] animate-pulse"
-                    />
-                    <div className="font-mono text-[11px] leading-tight truncate">
-                      <div className="font-semibold text-[var(--text-primary)] truncate">
-                        @MRMARCABLE
-                      </div>
-                      <div className="text-[10px] text-[var(--text-muted)] truncate">
-                        {profile.location}
-                      </div>
-                    </div>
-                  </div>
-                  <span className="shrink-0 font-mono text-[10px] font-semibold text-[var(--accent-text)]">
-                    {t.sceneUi.verifiedIdentity}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+              ✦
+            </span>
+            <span className="italic text-[var(--text-primary)]">
+              {`“${t.quotes.chaosStar}”`}
+            </span>
+          </blockquote>
         </div>
 
         {/* Bottom Action & Scroll Phase Bar */}

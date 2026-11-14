@@ -1,91 +1,59 @@
 "use client";
 
-import {
-  asciiPortraitDesktop,
-  asciiPortraitMobile,
-} from "@/data/ascii-portrait";
+import { asciiPortraitDesktop } from "@/data/ascii-portrait";
 
 /**
- * Full-section ambient ASCII background for Scene 01 (Hero).
- * Spans behind the entire hero stage and gradually fades evenly (memudar merata)
- * from right to left and toward the edges, aligning with the proportioned
- * portrait on the right column.
+ * Giant proportional ASCII GitHub emblem positioned on the right edge/corner
+ * of the Hero section so roughly half of the emblem emerges from the right side
+ * and gradually fades out evenly (memudar merata) toward the center/left.
  */
 export default function AsciiPortrait({
-  settled = true,
-  asciiFocus = false,
   className = "",
 }: {
-  settled?: boolean;
-  asciiFocus?: boolean;
   className?: string;
 }) {
-  // Build a wide background matrix by pairing a mirrored ambient stream on the left
-  // with the main portrait matrix anchored toward the right side of the hero section.
-  const wideLines = asciiPortraitDesktop.map((line, idx) => {
-    const leftEcho = asciiPortraitDesktop[
-      (idx + 6) % asciiPortraitDesktop.length
-    ]
-      .slice(8, 56)
-      .replace(/[#%*]/g, ":")
-      .replace(/[+=-]/g, ".");
-    return `${leftEcho}   ${line}   ${line}`;
-  });
-
   return (
     <div
       aria-hidden="true"
       className={`pointer-events-none absolute inset-0 overflow-hidden select-none font-mono ${className}`}
     >
-      {/* Desktop Wide Section ASCII Background */}
+      {/* Right-corner half-cropped proportional ASCII GitHub emblem */}
       <div
         style={{
           maskImage:
-            "linear-gradient(to right, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.16) 28%, rgba(0,0,0,0.48) 58%, rgba(0,0,0,0.92) 86%, rgba(0,0,0,0.4) 100%)",
+            "radial-gradient(circle at 92% 50%, rgba(0,0,0,0.95) 8%, rgba(0,0,0,0.72) 34%, rgba(0,0,0,0.38) 58%, rgba(0,0,0,0.12) 76%, transparent 94%), linear-gradient(to left, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.78) 28%, rgba(0,0,0,0.35) 58%, rgba(0,0,0,0.08) 80%, transparent 96%)",
           WebkitMaskImage:
-            "linear-gradient(to right, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.16) 28%, rgba(0,0,0,0.48) 58%, rgba(0,0,0,0.92) 86%, rgba(0,0,0,0.4) 100%)",
+            "radial-gradient(circle at 92% 50%, rgba(0,0,0,0.95) 8%, rgba(0,0,0,0.72) 34%, rgba(0,0,0,0.38) 58%, rgba(0,0,0,0.12) 76%, transparent 94%), linear-gradient(to left, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.78) 28%, rgba(0,0,0,0.35) 58%, rgba(0,0,0,0.08) 80%, transparent 96%)",
         }}
-        className={`hidden md:flex h-full w-full items-center justify-end pr-2 lg:pr-6 transition-opacity duration-[1800ms] ease-out ${
-          asciiFocus
-            ? "opacity-85"
-            : settled
-              ? "opacity-35"
-              : "opacity-80"
-        }`}
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-[36%] sm:translate-x-[34%] lg:translate-x-[32%] flex items-center justify-center"
       >
-        <pre className="text-[9px] lg:text-[10.5px] leading-[1.12] tracking-[0.06em] text-[var(--accent-text)]/85">
-          {wideLines.join("\n")}
+        <pre className="text-[11px] sm:text-[14px] md:text-[16px] lg:text-[18.5px] leading-[1.14] tracking-[0.04em] text-[var(--accent-text)] opacity-60 dark:opacity-55 transition-opacity duration-700">
+          {asciiPortraitDesktop.join("\n")}
         </pre>
       </div>
 
-      {/* Mobile Section ASCII Background */}
+      {/* Subtle secondary ambient echo fading further toward the center so the transition is ultra-smooth */}
       <div
         style={{
           maskImage:
-            "radial-gradient(ellipse 95% 85% at 65% 55%, rgba(0,0,0,0.75) 15%, rgba(0,0,0,0.25) 65%, transparent 100%)",
+            "radial-gradient(ellipse 75% 75% at 76% 50%, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.1) 50%, transparent 85%)",
           WebkitMaskImage:
-            "radial-gradient(ellipse 95% 85% at 65% 55%, rgba(0,0,0,0.75) 15%, rgba(0,0,0,0.25) 65%, transparent 100%)",
+            "radial-gradient(ellipse 75% 75% at 76% 50%, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.1) 50%, transparent 85%)",
         }}
-        className={`flex md:hidden h-full w-full items-center justify-center transition-opacity duration-[1800ms] ease-out ${
-          asciiFocus
-            ? "opacity-75"
-            : settled
-              ? "opacity-25"
-              : "opacity-65"
-        }`}
+        className="hidden sm:flex absolute right-0 top-1/2 -translate-y-1/2 translate-x-[18%] items-center justify-center"
       >
-        <pre className="text-[8px] leading-[1.1] tracking-[0.05em] text-[var(--accent-text)]/80">
-          {asciiPortraitMobile.join("\n")}
+        <pre className="text-[12px] lg:text-[15px] leading-[1.14] tracking-[0.06em] text-[var(--text-secondary)] opacity-35 blur-[0.4px]">
+          {asciiPortraitDesktop.join("\n")}
         </pre>
       </div>
 
-      {/* Smooth Radial & Vertical Vignette so ASCII fades evenly into the Hero card surface */}
+      {/* Vertical top & bottom edge feathering into the Hero card surface */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(circle at 74% 48%, transparent 20%, var(--bg-surface) 88%), linear-gradient(to bottom, var(--bg-surface) 0%, transparent 18%, transparent 82%, var(--bg-surface) 100%)",
-          opacity: asciiFocus ? 0.42 : 0.72,
+            "linear-gradient(to bottom, var(--bg-surface) 0%, transparent 14%, transparent 86%, var(--bg-surface) 100%)",
+          opacity: 0.65,
         }}
       />
     </div>
