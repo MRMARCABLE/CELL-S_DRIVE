@@ -84,12 +84,12 @@
 
 /* Per-Scene Contextual Silhouette Palette (01 -> 06) */
 html[data-scene="01"] {
-  --scene-glow-1: 220, 230, 242;
-  --scene-glow-2: 126, 200, 176;
+  --scene-glow-1: 126, 200, 176;
+  --scene-glow-2: 245, 158, 11;
 }
 html:not(.dark)[data-scene="01"] {
   --scene-glow-1: 47, 111, 94;
-  --scene-glow-2: 100, 116, 139;
+  --scene-glow-2: 217, 119, 6;
 }
 
 html[data-scene="02"] {
@@ -302,9 +302,9 @@ body {
   position: absolute;
   inset: 0;
   background: radial-gradient(
-    circle 180px at var(--mx, 50%) var(--my, 50%),
-    rgba(126, 200, 176, 0.16),
-    rgba(56, 189, 248, 0.08) 40%,
+    circle 110px at var(--mx, 50%) var(--my, 50%),
+    rgba(126, 200, 176, 0.08),
+    rgba(56, 189, 248, 0.04) 40%,
     transparent 70%
   );
   opacity: 0;

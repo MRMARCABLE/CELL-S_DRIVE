@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
 import { useReducedMotion } from "@/components/home/fx/hooks/useReducedMotion";
@@ -16,9 +16,6 @@ export default function IdentityScene() {
   const scrollProgress = useScrollProgress("scene-01");
   const [nameLabel, setNameLabel] = useState("MARCEL");
   const [scrambling, setScrambling] = useState(false);
-
-  const stageRef = useRef<HTMLDivElement | null>(null);
-  const spotlightRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!scrambling || reducedMotion) return;
@@ -36,28 +33,6 @@ export default function IdentityScene() {
       timers.forEach((id) => window.clearTimeout(id));
     };
   }, [reducedMotion, scrambling]);
-
-  const handleStageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const stage = stageRef.current;
-    const spot = spotlightRef.current;
-    if (!stage || !spot) return;
-    const rect = stage.getBoundingClientRect();
-    spot.style.setProperty(
-      "--spot-x",
-      `${Math.round(e.clientX - rect.left)}px`
-    );
-    spot.style.setProperty(
-      "--spot-y",
-      `${Math.round(e.clientY - rect.top)}px`
-    );
-    spot.style.opacity = "1";
-  };
-
-  const handleStageMouseLeave = () => {
-    if (spotlightRef.current) {
-      spotlightRef.current.style.opacity = "0";
-    }
-  };
 
   // Begin phasing out as the user scrolls past the middle of Scene 01 toward Scene 02
   const phaseOut = reducedMotion
@@ -100,28 +75,14 @@ export default function IdentityScene() {
       />
 
       <div
-        ref={stageRef}
         style={{
           ...stageStyle,
           background:
             "linear-gradient(100deg, color-mix(in srgb, var(--bg-surface) 84%, transparent) 0%, color-mix(in srgb, var(--bg-surface) 52%, transparent) 46%, color-mix(in srgb, var(--bg-surface) 10%, transparent) 78%, transparent 100%)",
         }}
-        onMouseMove={handleStageMouseMove}
-        onMouseLeave={handleStageMouseLeave}
         className="relative flex-1 flex flex-col justify-between overflow-hidden rounded-3xl border border-[var(--border-soft)] p-6 sm:p-9 lg:p-12 transition-transform duration-150 will-change-transform"
       >
-        {/* Cursor Radial Spotlight illuminating the unified Milky Way background */}
-        <div
-          ref={spotlightRef}
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-[1] opacity-0 transition-opacity duration-300"
-          style={{
-            background:
-              "radial-gradient(circle 260px at var(--spot-x, 76%) var(--spot-y, 48%), rgba(var(--scene-glow-1), 0.18), transparent 72%)",
-          }}
-        />
-
-        {/* Main Hero Content overlaid on top of the right-anchored fading ASCII background */}
+        {/* Main Hero Content overlaid on top of the right-anchored Milky Way background */}
         <div className="relative z-10 my-auto max-w-3xl space-y-6 py-4">
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="inline-flex items-center gap-2 rounded-md border border-[var(--accent-border)] bg-[var(--bg-bg,var(--accent-bg))] px-2.5 py-1 font-mono text-xs text-[var(--accent-text)]">
