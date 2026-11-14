@@ -607,20 +607,83 @@ export default function ConnectScene() {
           </form>
         </div>
 
-        {/* Final Session Sign-Off — Quote 3 (No Author Attribution) */}
+        {/* Final Session Sign-Off — Cosmic Singularity & Quote 3 (No Author Attribution) */}
         <div
-          className={`rounded-2xl border p-6 sm:p-7 text-center space-y-3 transition-all duration-500 ${
+          className={`relative overflow-hidden rounded-2xl border p-7 sm:p-9 text-center space-y-5 transition-all duration-700 ${
             logoutPulse
-              ? "border-[var(--accent-border)] bg-[var(--accent-bg)] shadow-[0_0_28px_var(--scene-glow-1)]"
-              : "border-[var(--border-soft)] bg-[var(--bg-elevated)]/75"
+              ? "border-[var(--accent-border)] bg-[var(--accent-bg)] shadow-[0_0_44px_var(--scene-glow-1)] scale-[1.01]"
+              : "border-[var(--border-soft)] bg-[var(--bg-elevated)]/80"
           }`}
         >
-          <div className="font-mono text-[11px] tracking-[0.2em] text-[var(--text-muted)] uppercase">
-            marca@ukwms:~$ logout // SESSION_IMPRINT
+          {/* Ambient Singularity Radial Halo */}
+          <div
+            aria-hidden="true"
+            className={`pointer-events-none absolute inset-0 transition-opacity duration-700 ${
+              logoutPulse ? "opacity-95" : "opacity-55"
+            }`}
+            style={{
+              background:
+                "radial-gradient(circle at 50% 28%, rgba(251,191,36,0.16), rgba(52,211,153,0.10) 38%, transparent 72%)",
+            }}
+          />
+
+          {/* Interactive Dancing Star Singularity Emblem */}
+          <div className="relative z-10 flex flex-col items-center justify-center gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setLogoutPulse(true);
+                playSfx("open");
+                window.setTimeout(() => setLogoutPulse(false), 2600);
+              }}
+              aria-label="Trigger Dancing Star Singularity"
+              className="group relative flex h-16 w-16 items-center justify-center rounded-full focus:outline-none"
+            >
+              {/* Outer Orbiting Binary Ring */}
+              <span
+                aria-hidden="true"
+                className={`pointer-events-none absolute inset-0 rounded-full border border-dashed transition-all duration-700 animate-[spin_18s_linear_infinite] ${
+                  logoutPulse
+                    ? "scale-125 border-amber-400/80"
+                    : "border-[var(--accent-border)] group-hover:scale-110"
+                }`}
+              />
+              {/* Inner Counter-Rotating Ring */}
+              <span
+                aria-hidden="true"
+                className={`pointer-events-none absolute inset-2 rounded-full border transition-all duration-500 animate-[spin_11s_linear_infinite_reverse] ${
+                  logoutPulse
+                    ? "scale-110 border-emerald-400/75"
+                    : "border-[var(--border-soft)] group-hover:border-[var(--accent-border)]"
+                }`}
+              />
+              {/* Core Glowing Dancing Star */}
+              <span
+                className={`relative flex h-9 w-9 items-center justify-center rounded-full border font-mono text-lg transition-all duration-500 ${
+                  logoutPulse
+                    ? "scale-115 border-amber-400/80 bg-amber-400/20 text-amber-300 shadow-[0_0_28px_rgba(251,191,36,0.65)]"
+                    : "border-[var(--accent-border)] bg-[var(--bg-surface)] text-[var(--accent-primary)] shadow-[0_0_16px_var(--scene-glow-1)] group-hover:scale-110"
+                }`}
+              >
+                ✦
+              </span>
+            </button>
+
+            <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.26em] text-[var(--text-muted)] uppercase">
+              <span className="text-amber-500 dark:text-amber-300">0101</span>
+              <span>SINGULARITY_STAR // STABLE_ORBIT</span>
+              <span className="text-amber-500 dark:text-amber-300">1010</span>
+            </div>
           </div>
-          <blockquote className="mx-auto max-w-2xl text-sm sm:text-base font-medium italic leading-relaxed text-[var(--text-primary)]">
-            {`“${t.quotes.neverHalfHearted}”`}
-          </blockquote>
+
+          <div className="relative z-10 space-y-3">
+            <div className="font-mono text-[11px] tracking-[0.2em] text-[var(--text-muted)] uppercase">
+              marca@ukwms:~$ logout // SESSION_IMPRINT
+            </div>
+            <blockquote className="mx-auto max-w-2xl text-sm sm:text-base font-medium italic leading-relaxed text-[var(--text-primary)]">
+              {`“${t.quotes.neverHalfHearted}”`}
+            </blockquote>
+          </div>
         </div>
       </div>
     </section>

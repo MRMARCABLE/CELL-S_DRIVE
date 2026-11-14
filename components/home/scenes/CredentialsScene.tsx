@@ -1,16 +1,58 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
+import { playSfx } from "@/components/shell/sound";
 import { credlyBadges, profile } from "@/data/portfolio";
 
 export default function CredentialsScene() {
   const { t } = useLanguage();
+  const sectionRef = useRef<HTMLElement | null>(null);
   const [selectedId, setSelectedId] = useState<string>(
     credlyBadges[0]?.id ?? "01"
   );
+  const [vaultReady, setVaultReady] = useState(false);
+  const [prismSweep, setPrismSweep] = useState(false);
+  const [typedStep, setTypedStep] = useState<number>(3);
+
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setVaultReady(true);
+            setPrismSweep(true);
+            setTypedStep(1);
+            window.setTimeout(() => setPrismSweep(false), 1500);
+          }
+        });
+      },
+      { threshold: 0.18 }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    const t1 = window.setTimeout(() => setTypedStep(1), 20);
+    const t2 = window.setTimeout(() => setTypedStep(2), 210);
+    const t3 = window.setTimeout(() => setTypedStep(3), 430);
+    return () => {
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
+      window.clearTimeout(t3);
+    };
+  }, [selectedId]);
+
+  const handleSelectCredential = (id: string) => {
+    setSelectedId(id);
+    setTypedStep(0);
+    playSfx("key");
+  };
 
   const selectedBadge = credlyBadges.find((b) => b.id === selectedId) ?? null;
   const selectedCert =
@@ -25,7 +67,12 @@ export default function CredentialsScene() {
   };
 
   return (
-    <section id="scene-05" data-scene-index="05" className="scene-stage">
+    <section
+      ref={sectionRef}
+      id="scene-05"
+      data-scene-index="05"
+      className="scene-stage"
+    >
       <ScenePrompt
         index="05"
         command="gpg --verify ./badges"
@@ -47,7 +94,7 @@ export default function CredentialsScene() {
           {/* Left 2x2 Holographic Badge Vault + Certificate Trigger */}
           <div className="lg:col-span-7 space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
-              {credlyBadges.map((badge) => {
+              {credlyBadges.map((badge, idx) => {
                 const isSelected = selectedId === badge.id;
 
                 return (
@@ -57,16 +104,27 @@ export default function CredentialsScene() {
                     tabIndex={0}
                     aria-pressed={isSelected}
                     data-cursor="gpg"
-                    onClick={() => setSelectedId(badge.id)}
-                    onMouseEnter={() => setSelectedId(badge.id)}
+                    onClick={() => handleSelectCredential(badge.id)}
+                    onMouseEnter={() => {
+                      if (selectedId !== badge.id) {
+                        setSelectedId(badge.id);
+                      }
+                    }}
                     onMouseMove={handleFoilMove}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" || e.key === " ") {
                         e.preventDefault();
-                        setSelectedId(badge.id);
+                        handleSelectCredential(badge.id);
                       }
                     }}
-                    className={`holo-card-foil group rounded-2xl border p-5 flex flex-col justify-between gap-4 cursor-pointer transition-all focus:outline-none ${
+                    style={{
+                      transitionDelay: `${idx * 90}ms`,
+                    }}
+                    className={`holo-card-foil group rounded-2xl border p-5 flex flex-col justify-between gap-4 cursor-pointer transition-all duration-500 focus:outline-none ${
+                      vaultReady
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-4"
+                    } ${
                       isSelected
                         ? "border-[var(--accent-border)] bg-[var(--bg-surface)] shadow-md -translate-y-0.5"
                         : "border-[var(--border-soft)] bg-[var(--bg-surface)]/75 hover:border-[var(--border-hover)] hover:-translate-y-0.5"
@@ -74,7 +132,9 @@ export default function CredentialsScene() {
                   >
                     <div className="flex items-start gap-4">
                       <div
-                        data-active={isSelected ? "true" : "false"}
+                        data-active={
+                          isSelected || prismSweep ? "true" : "false"
+                        }
                         className="holo-badge shrink-0 rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)] p-2.5 shadow-sm"
                       >
                         <Image
@@ -133,16 +193,25 @@ export default function CredentialsScene() {
                   tabIndex={0}
                   aria-pressed={isSelected}
                   data-cursor="gpg"
-                  onClick={() => setSelectedId(cert.id)}
-                  onMouseEnter={() => setSelectedId(cert.id)}
+                  onClick={() => handleSelectCredential(cert.id)}
+                  onMouseEnter={() => {
+                    if (selectedId !== cert.id) {
+                      setSelectedId(cert.id);
+                    }
+                  }}
                   onMouseMove={handleFoilMove}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-                      setSelectedId(cert.id);
+                      handleSelectCredential(cert.id);
                     }
                   }}
-                  className={`holo-card-foil soft-card rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-all focus:outline-none ${
+                  style={{ transitionDelay: "360ms" }}
+                  className={`holo-card-foil soft-card rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 cursor-pointer transition-all duration-500 focus:outline-none ${
+                    vaultReady
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-4"
+                  } ${
                     isSelected
                       ? "border-[var(--accent-border)] bg-[var(--bg-surface)] shadow-md"
                       : "hover:border-[var(--border-hover)]"
@@ -222,14 +291,42 @@ export default function CredentialsScene() {
                   </div>
                 </div>
 
-                {/* GPG Verification Output */}
-                <div className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/80 p-3.5 font-mono text-[11px] space-y-1 text-[var(--text-secondary)]">
-                  <div>{`$ gpg --verify badge_${selectedBadge.id}.asc`}</div>
-                  <div className="text-[var(--text-muted)]">
+                {/* GPG Verification Output — Live Terminal Typewriter */}
+                <div className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/80 p-3.5 font-mono text-[11px] space-y-1.5 text-[var(--text-secondary)]">
+                  <div className="flex items-center justify-between gap-2">
+                    <span>
+                      {`$ gpg --verify badge_${selectedBadge.id}.asc`}
+                      {typedStep < 3 && (
+                        <span className="cursor-blink ml-1 text-[var(--accent-primary)]">
+                          ▋
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-[9px] uppercase tracking-widest text-[var(--text-muted)]">
+                      {typedStep >= 3 ? "DECIPHERED" : "VERIFYING..."}
+                    </span>
+                  </div>
+                  <div
+                    className={`text-[var(--text-muted)] transition-all duration-200 ${
+                      typedStep >= 2
+                        ? "opacity-100 translate-x-0"
+                        : "opacity-0 -translate-x-1"
+                    }`}
+                  >
                     {`gpg: Signature issued ${selectedBadge.issuedAt}`}
                   </div>
-                  <div className="text-[var(--accent-text)]">
-                    {`gpg: Good signature from "${selectedBadge.issuer}" [VALID]`}
+                  <div
+                    className={`flex items-center gap-1.5 text-[var(--accent-text)] transition-all duration-200 ${
+                      typedStep >= 3
+                        ? "opacity-100 translate-x-0"
+                        : "opacity-0 -translate-x-1"
+                    }`}
+                  >
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>{`gpg: Good signature from "${selectedBadge.issuer}" [VALID]`}</span>
+                    <span className="cursor-blink text-[var(--accent-primary)]">
+                      _
+                    </span>
                   </div>
                 </div>
 
@@ -284,13 +381,41 @@ export default function CredentialsScene() {
                   </div>
                 </div>
 
-                <div className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/80 p-3.5 font-mono text-[11px] space-y-1 text-[var(--text-secondary)]">
-                  <div>{`$ gpg --verify cert_${selectedCert.id}.sig`}</div>
-                  <div className="text-[var(--text-muted)]">
+                <div className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/80 p-3.5 font-mono text-[11px] space-y-1.5 text-[var(--text-secondary)]">
+                  <div className="flex items-center justify-between gap-2">
+                    <span>
+                      {`$ gpg --verify cert_${selectedCert.id}.sig`}
+                      {typedStep < 3 && (
+                        <span className="cursor-blink ml-1 text-[var(--accent-primary)]">
+                          ▋
+                        </span>
+                      )}
+                    </span>
+                    <span className="text-[9px] uppercase tracking-widest text-[var(--text-muted)]">
+                      {typedStep >= 3 ? "DECIPHERED" : "VERIFYING..."}
+                    </span>
+                  </div>
+                  <div
+                    className={`text-[var(--text-muted)] transition-all duration-200 ${
+                      typedStep >= 2
+                        ? "opacity-100 translate-x-0"
+                        : "opacity-0 -translate-x-1"
+                    }`}
+                  >
                     {`Type: ${selectedCert.credentialType}`}
                   </div>
-                  <div className="text-[var(--accent-text)]">
-                    {t.sceneUi.certificateValidLabel}
+                  <div
+                    className={`flex items-center gap-1.5 text-[var(--accent-text)] transition-all duration-200 ${
+                      typedStep >= 3
+                        ? "opacity-100 translate-x-0"
+                        : "opacity-0 -translate-x-1"
+                    }`}
+                  >
+                    <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>{t.sceneUi.certificateValidLabel}</span>
+                    <span className="cursor-blink text-[var(--accent-primary)]">
+                      _
+                    </span>
                   </div>
                 </div>
 
@@ -312,6 +437,18 @@ export default function CredentialsScene() {
               </div>
             ) : null}
           </div>
+        </div>
+
+        {/* Outgoing Transition Bridge: 05 -> 06 Cosmic Singularity Convergence */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none flex flex-col items-center justify-center pt-4 opacity-80"
+        >
+          <div className="flex items-center gap-2 font-mono text-[10px] tracking-[0.26em] uppercase text-[var(--text-muted)]">
+            <span className="inline-block h-1.5 w-1.5 rounded-full bg-[var(--accent-primary)] animate-ping" />
+            <span>05 → 06 // CONVERGING GALAXY TO SINGULARITY</span>
+          </div>
+          <div className="mt-2 h-10 w-px bg-gradient-to-b from-[var(--accent-primary)] via-amber-400/50 to-transparent" />
         </div>
       </div>
     </section>
