@@ -22,7 +22,6 @@ function getRgbLabel(rgb: FocusDomain["rgb"]): string {
 export default function FocusScene() {
   const { t } = useLanguage();
   const [flippedIds, setFlippedIds] = useState<Record<string, boolean>>({});
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
   const [revealAll, setRevealAll] = useState(false);
 
   const toggleCard = (id: string) => {
@@ -51,7 +50,7 @@ export default function FocusScene() {
           <button
             type="button"
             onClick={handleRevealAll}
-            className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 font-mono text-[11px] text-[var(--text-primary)] hover:border-[var(--border-hover)] transition"
+            className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 font-mono text-[11px] text-[var(--text-primary)] hover:border-[var(--border-hover)] transition cursor-pointer"
           >
             {revealAll ? t.sceneUi.hideAllCards : t.sceneUi.revealAllCards}
           </button>
@@ -72,20 +71,17 @@ export default function FocusScene() {
         {/* 3 Playing Cards Grid */}
         <div className="relative z-10 grid gap-6 md:grid-cols-3">
           {t.focusDomains.map((domain) => {
-            const isOpen =
-              revealAll ||
-              Boolean(flippedIds[domain.id]) ||
-              hoveredId === domain.id;
+            const isOpen = revealAll || Boolean(flippedIds[domain.id]);
             const rgbClass = getRgbCardClass(domain.rgb);
+            const filteredProjectsHref = `/projects?category=${encodeURIComponent(
+              domain.projectCategory
+            )}`;
 
             return (
               <div
                 key={domain.id}
-                className="playing-card-perspective mx-auto w-full max-w-[320px]"
-                onMouseEnter={() => setHoveredId(domain.id)}
-                onMouseLeave={() =>
-                  setHoveredId((prev) => (prev === domain.id ? null : prev))
-                }
+                data-open={isOpen ? "true" : "false"}
+                className="playing-card-perspective mx-auto w-full max-w-[330px]"
               >
                 <div
                   role="button"
@@ -105,7 +101,7 @@ export default function FocusScene() {
                 >
                   {/* CLOSED FACE (Front of Card before flip) */}
                   <div
-                    className={`playing-card-face ${rgbClass} flex flex-col justify-between rounded-2xl border border-[var(--card-rgb-border)] bg-[var(--bg-surface)]/95 p-5 backdrop-blur-md transition-shadow`}
+                    className={`playing-card-face ${rgbClass} flex flex-col justify-between rounded-2xl bg-[var(--bg-surface)]/95 p-5 backdrop-blur-md transition-shadow`}
                   >
                     {/* Top Corner Index */}
                     <div className="flex items-start justify-between font-mono">
@@ -137,7 +133,7 @@ export default function FocusScene() {
                       </h3>
 
                       <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-3 py-1 font-mono text-[10px] text-[var(--text-muted)]">
-                        <span>[ FLIP CARD ↻ ]</span>
+                        <span>{t.sceneUi.flipCardCue}</span>
                       </div>
                     </div>
 
@@ -159,7 +155,7 @@ export default function FocusScene() {
 
                   {/* OPEN FACE (Revealed Back of Card after 180deg flip) */}
                   <div
-                    className={`playing-card-back ${rgbClass} flex flex-col justify-between rounded-2xl border border-[var(--card-rgb-border)] bg-[var(--bg-surface)] p-5 shadow-lg`}
+                    className={`playing-card-back ${rgbClass} flex flex-col justify-between rounded-2xl bg-[var(--bg-surface)] p-5 shadow-lg`}
                   >
                     {/* Header */}
                     <div className="space-y-3">
@@ -168,7 +164,7 @@ export default function FocusScene() {
                           {`${domain.suit} ${domain.id} // ${domain.code}`}
                         </span>
                         <span className="rounded border border-[var(--card-rgb-border)] bg-[var(--card-rgb-bg)] px-1.5 py-0.5 text-[10px] text-[var(--card-rgb-text)]">
-                          ACTIVE
+                          {t.sceneUi.activeLabel}
                         </span>
                       </div>
 
@@ -184,7 +180,7 @@ export default function FocusScene() {
                     {/* Architecture Highlights */}
                     <div className="space-y-2 border-t border-[var(--border-soft)] pt-3">
                       <div className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                        KEY CAPABILITIES
+                        {t.sceneUi.keyCapabilities}
                       </div>
                       <ul className="space-y-1.5 font-mono text-[11px] text-[var(--text-primary)]">
                         {domain.highlights.map((item) => (
@@ -202,7 +198,7 @@ export default function FocusScene() {
                         {domain.suit}
                       </span>
                       <Link
-                        href="/projects"
+                        href={filteredProjectsHref}
                         onClick={(e) => e.stopPropagation()}
                         className="text-[var(--card-rgb-text)] hover:underline"
                       >

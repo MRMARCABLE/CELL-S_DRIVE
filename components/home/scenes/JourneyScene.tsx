@@ -99,10 +99,10 @@ export default function JourneyScene() {
               const active = laneFilter === filterKey;
               const label =
                 filterKey === "all"
-                  ? "ALL"
+                  ? t.sceneUi.filterAll
                   : filterKey === "exp"
-                    ? "EXP"
-                    : "EDU";
+                    ? t.sceneUi.filterExp
+                    : t.sceneUi.filterEdu;
               return (
                 <button
                   key={filterKey}
@@ -281,7 +281,7 @@ export default function JourneyScene() {
               {/* Skills / Modules */}
               <div className="space-y-2 pt-1">
                 <div className="text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                  LINKED MODULES & SKILLS
+                  {t.sceneUi.linkedModules}
                 </div>
                 <div className="flex flex-wrap gap-1.5">
                   {activeCommit.skills.map((skill) => (
@@ -302,9 +302,9 @@ export default function JourneyScene() {
                   onClick={() => stepCommit(-1)}
                   className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
                 >
-                  ← prev commit
+                  {t.sceneUi.prevCommit}
                 </button>
-                <span className="text-[10px] text-[var(--text-muted)]">
+                <span className="text-[10px] text-[var(--text-muted)] text-center px-2">
                   {t.sceneUi.inspectCommit}
                 </span>
                 <button
@@ -312,7 +312,7 @@ export default function JourneyScene() {
                   onClick={() => stepCommit(1)}
                   className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
                 >
-                  next commit →
+                  {t.sceneUi.nextCommit}
                 </button>
               </div>
             </div>

@@ -84,7 +84,7 @@ export default function CredentialsScene() {
                       </h3>
 
                       <div className="inline-flex items-center gap-1.5 font-mono text-[10px] text-[var(--accent-text)]">
-                        <span>GPG_SIG // OK ✓</span>
+                        <span>{t.sceneUi.gpgValidLabel}</span>
                       </div>
                     </div>
                   </div>
@@ -159,7 +159,7 @@ export default function CredentialsScene() {
                 {/* Verified Skills */}
                 <div className="space-y-2">
                   <div className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                    VERIFIED COMPETENCIES
+                    {t.sceneUi.verifiedCompetencies}
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {activeBadge.skills.map((skill) => (

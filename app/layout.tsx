@@ -4,8 +4,8 @@ import "./globals.css";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import Navbar from "@/components/Navbar";
 import CursorFollower from "@/components/shell/CursorFollower";
+import FooterBar from "@/components/shell/FooterBar";
 import HotkeysController from "@/components/shell/HotkeysController";
-import SessionUptime from "@/components/shell/SessionUptime";
 import TabTitleController from "@/components/shell/TabTitleController";
 import { profile } from "@/data/portfolio";
 
@@ -87,66 +87,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <CursorFollower />
           <Navbar />
 
-          <main className="relative z-10 flex-1 max-w-4xl w-full mx-auto px-6 py-12">
+          <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-6 py-10 lg:py-12">
             {children}
           </main>
 
-          <footer className="relative z-10 border-t border-[var(--border-soft)] bg-[var(--bg-nav)] backdrop-blur-md py-8">
-            <div className="max-w-4xl mx-auto px-6 space-y-4 text-xs text-[var(--text-muted)]">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex flex-wrap items-center gap-2.5 font-mono">
-                  <span className="text-[var(--accent-text)]">✦</span>
-                  <span>© 2026 YOHANNES MARCEL LALOPUA // SURABAYA, ID</span>
-                  <SessionUptime />
-                </div>
-                <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-5 font-mono">
-                  <a
-                    href={`mailto:${profile.email}`}
-                    className="text-[var(--text-secondary)] hover:text-[var(--accent-text)] transition"
-                  >
-                    EMAIL ↗
-                  </a>
-                  <a
-                    href={profile.githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-                  >
-                    GITHUB ↗
-                  </a>
-                  <a
-                    href={profile.linkedinUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-                  >
-                    LINKEDIN ↗
-                  </a>
-                  <a
-                    href={profile.credlyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-                  >
-                    CREDLY ↗
-                  </a>
-                  <a
-                    href={profile.gitEngUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition"
-                  >
-                    GIT-ENG ↗
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-2 border-t border-[var(--border-soft)] pt-3 font-mono text-[11px] text-[var(--text-muted)]">
-                <span>SHORTCUTS: [T] Theme · [L] Lang · [/] CLI · [1-6] Scene · [G P] Projects</span>
-                <span>NRP // 5803025050</span>
-              </div>
-            </div>
-          </footer>
+          <FooterBar />
         </LanguageProvider>
       </body>
     </html>

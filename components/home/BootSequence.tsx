@@ -5,6 +5,11 @@ import { useLanguage } from "@/components/LanguageProvider";
 import { useReducedMotion } from "@/components/home/fx/hooks/useReducedMotion";
 
 const BOOT_SESSION_KEY = "marca_boot_seen";
+export const BOOT_REPLAY_EVENT = "marca-boot-replay";
+
+// Tracks whether the current browser tab has already run BootSequence so
+// navigating back from /projects via Next <Link> feels instant.
+let hasBootedInTab = false;
 
 const CHAOS_LINES = [
   "01001101 01000001 01010010 01000011 01000001 // INIT_CORE",
@@ -16,12 +21,14 @@ const CHAOS_LINES = [
 export default function BootSequence() {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(() => !hasBootedInTab);
   const [fadingOut, setFadingOut] = useState(false);
   const [phase, setPhase] = useState<"chaos" | "coalesce">("chaos");
   const [progress, setProgress] = useState(12);
+  const [runCount, setRunCount] = useState(0);
 
   const dismiss = useCallback(() => {
+    hasBootedInTab = true;
     setFadingOut(true);
     try {
       sessionStorage.setItem(BOOT_SESSION_KEY, "1");
@@ -34,7 +41,22 @@ export default function BootSequence() {
   }, []);
 
   useEffect(() => {
+    const handleReplay = () => {
+      hasBootedInTab = false;
+      setFadingOut(false);
+      setPhase("chaos");
+      setProgress(12);
+      setVisible(true);
+      setRunCount((c) => c + 1);
+    };
+    window.addEventListener(BOOT_REPLAY_EVENT, handleReplay);
+    return () => window.removeEventListener(BOOT_REPLAY_EVENT, handleReplay);
+  }, []);
+
+  useEffect(() => {
+    if (!visible) return;
     if (reducedMotion) {
+      hasBootedInTab = true;
       const id = window.setTimeout(() => setVisible(false), 0);
       return () => window.clearTimeout(id);
     }
@@ -46,8 +68,8 @@ export default function BootSequence() {
       seenInSession = false;
     }
 
-    const totalMs = seenInSession ? 850 : 2550;
-    const coalesceAt = seenInSession ? 260 : 1050;
+    const totalMs = runCount > 0 ? 2550 : seenInSession ? 850 : 2550;
+    const coalesceAt = runCount > 0 ? 1050 : seenInSession ? 260 : 1050;
 
     const p1 = window.setTimeout(() => setProgress(58), coalesceAt * 0.5);
     const p2 = window.setTimeout(() => {
@@ -63,7 +85,7 @@ export default function BootSequence() {
       window.clearTimeout(p2);
       window.clearTimeout(p3);
     };
-  }, [dismiss, reducedMotion]);
+  }, [dismiss, reducedMotion, runCount, visible]);
 
   useEffect(() => {
     if (!visible) return;

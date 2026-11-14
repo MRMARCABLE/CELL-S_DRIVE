@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
 
@@ -45,14 +45,36 @@ export default function StackScene() {
   const [selectedSkill, setSelectedSkill] = useState<{
     skill: string;
     busId: string;
-    busCategory: string;
     pinHex: string;
   }>({
     skill: "Next.js (App Router)",
     busId: "BUS_01",
-    busCategory: t.techCategories[0]?.category ?? "Web & Frontend Architecture",
     pinHex: "0x01",
   });
+
+  // Compute strict sequential hex pin addresses (0x01..0x0F) without skipping indices
+  const busesWithPins = useMemo(() => {
+    return t.techCategories.map((group, groupIdx) => {
+      const startOffset = t.techCategories
+        .slice(0, groupIdx)
+        .reduce((acc, g) => acc + g.items.length, 0);
+      return {
+        ...group,
+        keycaps: group.items.map((skill, idx) => ({
+          skill,
+          pinHex: `0x${(startOffset + idx + 1)
+            .toString(16)
+            .toUpperCase()
+            .padStart(2, "0")}`,
+        })),
+      };
+    });
+  }, [t.techCategories]);
+
+  const activeCategoryLabel =
+    t.techCategories.find((g) => g.id === selectedSkill.busId)?.category ??
+    t.techCategories[0]?.category ??
+    "";
 
   return (
     <section id="scene-04" data-scene-index="04" className="scene-stage">
@@ -70,7 +92,7 @@ export default function StackScene() {
             <button
               type="button"
               onClick={() => setActiveBus(null)}
-              className={`rounded-lg border px-3 py-1.5 transition ${
+              className={`rounded-lg border px-3 py-1.5 transition cursor-pointer ${
                 activeBus === null
                   ? "border-[var(--accent-border)] bg-[var(--accent-bg)] text-[var(--accent-text)] font-semibold"
                   : "border-[var(--border-soft)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:border-[var(--border-hover)]"
@@ -79,7 +101,7 @@ export default function StackScene() {
               {t.sceneUi.filterBusAll}
             </button>
 
-            {t.techCategories.map((group) => {
+            {busesWithPins.map((group) => {
               const isBusSelected = activeBus === group.id;
               const colors = getBusColorClasses(group.id);
               return (
@@ -91,7 +113,7 @@ export default function StackScene() {
                       prev === group.id ? null : group.id
                     )
                   }
-                  className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 transition ${
+                  className={`inline-flex items-center gap-2 rounded-lg border px-3 py-1.5 transition cursor-pointer ${
                     isBusSelected
                       ? `${colors.badge} font-semibold`
                       : "border-[var(--border-soft)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:border-[var(--border-hover)]"
@@ -105,13 +127,13 @@ export default function StackScene() {
           </div>
 
           <span className="font-mono text-[11px] text-[var(--text-muted)]">
-            15 MODULES MOUNTED // 3 CIRCUIT BUSES
+            {t.sceneUi.modulesMounted}
           </span>
         </div>
 
         {/* 3 Circuit Bus Columns */}
         <div className="grid gap-5 lg:grid-cols-3">
-          {t.techCategories.map((group, groupIdx) => {
+          {busesWithPins.map((group) => {
             const isDimmed = activeBus !== null && activeBus !== group.id;
             const isHighlighted = activeBus === group.id;
             const colors = getBusColorClasses(group.id);
@@ -151,12 +173,7 @@ export default function StackScene() {
 
                   {/* Mechanical Keycaps Grid */}
                   <div className="grid grid-cols-2 gap-2.5 pt-1">
-                    {group.items.map((skill, skillIdx) => {
-                      const pinNumber = groupIdx * 6 + skillIdx + 1;
-                      const pinHex = `0x${pinNumber
-                        .toString(16)
-                        .toUpperCase()
-                        .padStart(2, "0")}`;
+                    {group.keycaps.map(({ skill, pinHex }) => {
                       const isKeySelected = selectedSkill.skill === skill;
 
                       return (
@@ -167,7 +184,6 @@ export default function StackScene() {
                             setSelectedSkill({
                               skill,
                               busId: group.id,
-                              busCategory: group.category,
                               pinHex,
                             })
                           }
@@ -175,11 +191,10 @@ export default function StackScene() {
                             setSelectedSkill({
                               skill,
                               busId: group.id,
-                              busCategory: group.category,
                               pinHex,
                             })
                           }
-                          className={`group/key relative flex flex-col justify-between rounded-xl border border-b-[3px] p-2.5 text-left transition-all active:translate-y-0.5 ${
+                          className={`group/key relative flex flex-col justify-between rounded-xl border border-b-[3px] p-2.5 text-left transition-all active:translate-y-0.5 cursor-pointer ${
                             isKeySelected
                               ? "border-[var(--accent-border)] bg-[var(--bg-surface)] shadow-sm -translate-y-0.5"
                               : "border-[var(--border-soft)] bg-[var(--bg-surface)]/85 hover:border-[var(--border-hover)] hover:-translate-y-0.5"
@@ -206,8 +221,8 @@ export default function StackScene() {
 
                 {/* Bus Trace Footer */}
                 <div className="flex items-center justify-between border-t border-[var(--border-soft)] pt-3 font-mono text-[10px] text-[var(--text-muted)]">
-                  <span>{`MODULES: ${group.items.length}`}</span>
-                  <span>STATUS: ONLINE</span>
+                  <span>{`${t.sceneUi.modulesCountLabel}: ${group.items.length}`}</span>
+                  <span>{t.sceneUi.statusOnline}</span>
                 </div>
               </div>
             );
@@ -225,7 +240,7 @@ export default function StackScene() {
             </span>
             <span className="text-[var(--text-muted)]">—</span>
             <span className="text-[var(--text-secondary)]">
-              {selectedSkill.busCategory}
+              {activeCategoryLabel}
             </span>
           </div>
 

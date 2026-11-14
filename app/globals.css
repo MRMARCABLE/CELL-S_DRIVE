@@ -155,13 +155,21 @@ body {
 
 /* Full-Viewport Scene Stage */
 .scene-stage {
-  min-height: calc(100dvh - 4.5rem);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding-top: 2.5rem;
-  padding-bottom: 2.5rem;
+  justify-content: flex-start;
+  padding-top: 1.5rem;
+  padding-bottom: 1.75rem;
   position: relative;
+}
+
+@media (min-width: 1024px) {
+  .scene-stage {
+    min-height: calc(100dvh - 4.5rem);
+    justify-content: center;
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
 }
 
 /* Blinking Terminal Block Cursor */
@@ -192,10 +200,14 @@ body {
   transition: transform 650ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 350ms ease;
 }
 
-.playing-card-perspective:hover .playing-card-inner,
 .playing-card-perspective:focus-visible .playing-card-inner,
-.playing-card-perspective[data-open="true"] .playing-card-inner {
+.playing-card-perspective[data-open="true"] .playing-card-inner,
+.playing-card-inner.is-flipped {
   transform: rotateY(180deg);
+}
+
+.playing-card-perspective:not([data-open="true"]):hover .playing-card-inner:not(.is-flipped) {
+  transform: translateY(-6px);
 }
 
 .playing-card-face,
@@ -212,24 +224,36 @@ body {
 }
 
 .rgb-card-r {
-  border: 1px solid var(--rgb-r-border);
-  background-color: var(--rgb-r-bg);
-  box-shadow: var(--rgb-r-glow);
-  color: var(--rgb-r-text);
+  --card-rgb-border: var(--rgb-r-border);
+  --card-rgb-bg: var(--rgb-r-bg);
+  --card-rgb-text: var(--rgb-r-text);
+  --card-rgb-glow: var(--rgb-r-glow);
+  border: 1px solid var(--card-rgb-border);
+  background-color: var(--card-rgb-bg);
+  box-shadow: var(--card-rgb-glow);
+  color: var(--card-rgb-text);
 }
 
 .rgb-card-g {
-  border: 1px solid var(--rgb-g-border);
-  background-color: var(--rgb-g-bg);
-  box-shadow: var(--rgb-g-glow);
-  color: var(--rgb-g-text);
+  --card-rgb-border: var(--rgb-g-border);
+  --card-rgb-bg: var(--rgb-g-bg);
+  --card-rgb-text: var(--rgb-g-text);
+  --card-rgb-glow: var(--rgb-g-glow);
+  border: 1px solid var(--card-rgb-border);
+  background-color: var(--card-rgb-bg);
+  box-shadow: var(--card-rgb-glow);
+  color: var(--card-rgb-text);
 }
 
 .rgb-card-b {
-  border: 1px solid var(--rgb-b-border);
-  background-color: var(--rgb-b-bg);
-  box-shadow: var(--rgb-b-glow);
-  color: var(--rgb-b-text);
+  --card-rgb-border: var(--rgb-b-border);
+  --card-rgb-bg: var(--rgb-b-bg);
+  --card-rgb-text: var(--rgb-b-text);
+  --card-rgb-glow: var(--rgb-b-glow);
+  border: 1px solid var(--card-rgb-border);
+  background-color: var(--card-rgb-bg);
+  box-shadow: var(--card-rgb-glow);
+  color: var(--card-rgb-text);
 }
 
 /* Holographic Badge Glint */

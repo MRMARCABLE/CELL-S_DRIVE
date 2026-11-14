@@ -89,7 +89,7 @@ export default function IdentityScene() {
               <div className="mt-3 sm:mt-0 sm:absolute sm:bottom-3 sm:left-3 flex items-center gap-3 rounded-xl border border-[var(--border-soft)] bg-[var(--bg-surface)]/95 backdrop-blur-md p-2 pr-3.5 shadow-md">
                 <div className="relative shrink-0">
                   <Image
-                    src={profile.avatarUrl}
+                    src="/avatar.png"
                     alt={`Profile photo of ${profile.name}`}
                     width={48}
                     height={48}
@@ -109,7 +109,7 @@ export default function IdentityScene() {
                     {profile.location}
                   </div>
                   <div className="text-[10px] text-[var(--accent-text)] mt-0.5">
-                    IDENTITY_VERIFIED ✓
+                    {t.sceneUi.verifiedIdentity}
                   </div>
                 </div>
               </div>

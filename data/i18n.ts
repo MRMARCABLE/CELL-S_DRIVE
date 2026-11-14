@@ -34,14 +34,31 @@ export interface LocalizedContent {
     initializing: string;
   };
   sceneUi: {
+    verifiedIdentity: string;
     revealAllCards: string;
     hideAllCards: string;
     tapToFlip: string;
+    flipCardCue: string;
+    keyCapabilities: string;
+    activeLabel: string;
     inspectCommit: string;
+    linkedModules: string;
+    prevCommit: string;
+    nextCommit: string;
+    filterAll: string;
+    filterExp: string;
+    filterEdu: string;
     filterBusAll: string;
+    modulesMounted: string;
+    modulesCountLabel: string;
+    statusOnline: string;
     inspectBadge: string;
+    verifiedCompetencies: string;
+    gpgValidLabel: string;
     cliPlaceholder: string;
     cliHint: string;
+    shortcutsFooter: string;
+    clearFilter: string;
   };
   hero: {
     sectionLabel: string;
@@ -111,15 +128,33 @@ export const translations: Record<Locale, LocalizedContent> = {
       initializing: "CALIBRATING CHAOS MATRIX // NRP 5803025050",
     },
     sceneUi: {
+      verifiedIdentity: "IDENTITY_VERIFIED ✓",
       revealAllCards: "Reveal All Cards",
       hideAllCards: "Reset Deck",
-      tapToFlip: "Click or hover card to flip",
+      tapToFlip: "Click or tap card to flip",
+      flipCardCue: "[ FLIP CARD ↻ ]",
+      keyCapabilities: "KEY CAPABILITIES",
+      activeLabel: "ACTIVE",
       inspectCommit: "Select a commit node to inspect details",
+      linkedModules: "LINKED MODULES & SKILLS",
+      prevCommit: "← prev commit",
+      nextCommit: "next commit →",
+      filterAll: "ALL",
+      filterExp: "EXP",
+      filterEdu: "EDU",
       filterBusAll: "ALL BUSES ACTIVE",
+      modulesMounted: "15 MODULES MOUNTED // 3 CIRCUIT BUSES",
+      modulesCountLabel: "MODULES",
+      statusOnline: "STATUS: ONLINE",
       inspectBadge: "CREDENTIAL INSPECTOR // SELECT EMBLEM",
+      verifiedCompetencies: "VERIFIED COMPETENCIES",
+      gpgValidLabel: "GPG_SIG // OK ✓",
       cliPlaceholder: "Type 'help', 'neofetch', 'quote', 'chaos', or '1'..'5'...",
       cliHint:
         "Interactive shell — try: help · neofetch · sudo hire marcel · quote · chaos · clear",
+      shortcutsFooter:
+        "SHORTCUTS: [T] Theme · [L] Lang · [/] CLI · [1-6] Scene · [G P] Projects",
+      clearFilter: "Show all",
     },
     hero: {
       sectionLabel: "01 // DEVELOPER PROFILE",
@@ -196,16 +231,34 @@ export const translations: Record<Locale, LocalizedContent> = {
       initializing: "MENGKALIBRASI MATRIKS KEKACAUAN // NRP 5803025050",
     },
     sceneUi: {
+      verifiedIdentity: "IDENTITAS TERVERIFIKASI ✓",
       revealAllCards: "Buka Semua Kartu",
       hideAllCards: "Tutup Dek",
-      tapToFlip: "Klik atau arahkan kursor untuk membalik kartu",
+      tapToFlip: "Klik atau ketuk kartu untuk membalik",
+      flipCardCue: "[ BALIK KARTU ↻ ]",
+      keyCapabilities: "KAPABILITAS UTAMA",
+      activeLabel: "AKTIF",
       inspectCommit: "Pilih node commit untuk melihat detail",
+      linkedModules: "MODUL & KEAHLIAN TERKAIT",
+      prevCommit: "← sebelumnya",
+      nextCommit: "berikutnya →",
+      filterAll: "SEMUA",
+      filterExp: "PENGALAMAN",
+      filterEdu: "PENDIDIKAN",
       filterBusAll: "SEMUA BUS AKTIF",
+      modulesMounted: "15 MODUL TERPASANG // 3 BUS SIRKUIT",
+      modulesCountLabel: "MODUL",
+      statusOnline: "STATUS: AKTIF",
       inspectBadge: "INSPEKTOR KREDENSIAL // PILIH LENCANA",
+      verifiedCompetencies: "KOMPETENSI TERVERIFIKASI",
+      gpgValidLabel: "GPG_SIG // VALID ✓",
       cliPlaceholder:
         "Ketik 'help', 'neofetch', 'quote', 'chaos', atau '1'..'5'...",
       cliHint:
         "Shell interaktif — coba: help · neofetch · sudo hire marcel · quote · chaos · clear",
+      shortcutsFooter:
+        "PINTASAN: [T] Tema · [L] Bahasa · [/] CLI · [1-6] Scene · [G P] Proyek",
+      clearFilter: "Tampilkan semua",
     },
     hero: {
       sectionLabel: "01 // PROFIL PENGEMBANG",

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { Suspense } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ProjectCatalog from "@/components/ProjectCatalog";
 import ScenePrompt from "@/components/home/ScenePrompt";
@@ -43,7 +44,15 @@ export default function ProjectsContent() {
       </section>
 
       {/* 02 // FILTERABLE PROJECT CARDS */}
-      <ProjectCatalog />
+      <Suspense
+        fallback={
+          <div className="soft-card rounded-2xl p-8 font-mono text-xs text-[var(--text-muted)]">
+            cat ./projects/*.spec // indexing...
+          </div>
+        }
+      >
+        <ProjectCatalog />
+      </Suspense>
 
       {/* 03 // BOTTOM NAVIGATION BAR */}
       <section className="soft-card rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">

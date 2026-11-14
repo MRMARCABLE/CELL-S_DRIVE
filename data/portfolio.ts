@@ -1,8 +1,15 @@
+export type ProjectCategory =
+  | "AI & Automation"
+  | "Embedded & Vision"
+  | "3D Web"
+  | "UI/UX";
+
 export interface FocusDomain {
   id: string;
   code: string;
   suit: "♦" | "♣" | "♠";
   rgb: "r" | "g" | "b";
+  projectCategory: ProjectCategory;
   title: string;
   desc: string;
   highlights: string[];
@@ -59,12 +66,6 @@ export interface CertificateItem {
   skills: string[];
 }
 
-export type ProjectCategory =
-  | "AI & Automation"
-  | "Embedded & Vision"
-  | "3D Web"
-  | "UI/UX";
-
 export interface ProjectItem {
   id: string;
   code: string;
@@ -101,6 +102,7 @@ export const focusDomains: FocusDomain[] = [
     code: "AI.AGENT",
     suit: "♦",
     rgb: "r",
+    projectCategory: "AI & Automation",
     title: "Autonomous AI & Workflow Automation",
     desc: "Building autonomous AI agents and automated pipelines for operational audits, document retrieval, and smart workspace workflows using Langflow, IBM watsonx, Astra DB, and n8n.",
     highlights: ["Langflow & IBM watsonx", "Vector RAG (Astra DB)", "n8n Event Pipelines"],
@@ -112,6 +114,7 @@ export const focusDomains: FocusDomain[] = [
     code: "SYS.EMBED",
     suit: "♣",
     rgb: "g",
+    projectCategory: "Embedded & Vision",
     title: "Embedded Systems & Computer Vision",
     desc: "Developing ESP32-based desktop robotics with 2-axis pan-tilt actuation and real-time face tracking powered by Python, OpenCV, and MediaPipe.",
     highlights: ["ESP32 2-Axis Actuation", "OpenCV & MediaPipe", "Serial Hardware Telemetry"],
@@ -123,6 +126,7 @@ export const focusDomains: FocusDomain[] = [
     code: "WEB.3D_UX",
     suit: "♠",
     rgb: "b",
+    projectCategory: "3D Web",
     title: "Interactive 3D Web & UI/UX Engineering",
     desc: "Designing User-Centered Design (UCD) interfaces in Figma and interactive 3D mathematical visualizations in the browser with React, Next.js, and Three.js.",
     highlights: ["Next.js & React Architecture", "Three.js 3D Space", "Figma UCD Systems"],

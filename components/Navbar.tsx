@@ -61,7 +61,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-[var(--border-soft)] bg-[var(--bg-nav)] backdrop-blur-md">
-      <nav className="max-w-4xl mx-auto px-6 h-16 flex justify-between items-center gap-2">
+      <nav className="max-w-6xl mx-auto px-6 h-16 flex justify-between items-center gap-2">
         <div className="flex items-center gap-3">
           <Link
             href="/"
