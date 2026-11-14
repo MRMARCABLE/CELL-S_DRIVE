@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
-import AsciiPortrait from "@/components/home/fx/AsciiPortrait";
 import { useReducedMotion } from "@/components/home/fx/hooks/useReducedMotion";
 import { useScrollProgress } from "@/components/home/fx/hooks/useScrollProgress";
 import { profile } from "@/data/portfolio";
@@ -102,22 +101,23 @@ export default function IdentityScene() {
 
       <div
         ref={stageRef}
-        style={stageStyle}
+        style={{
+          ...stageStyle,
+          background:
+            "linear-gradient(100deg, color-mix(in srgb, var(--bg-surface) 84%, transparent) 0%, color-mix(in srgb, var(--bg-surface) 52%, transparent) 46%, color-mix(in srgb, var(--bg-surface) 10%, transparent) 78%, transparent 100%)",
+        }}
         onMouseMove={handleStageMouseMove}
         onMouseLeave={handleStageMouseLeave}
-        className="soft-card relative flex-1 flex flex-col justify-between overflow-hidden rounded-3xl p-6 sm:p-9 lg:p-12 transition-transform duration-150 will-change-transform"
+        className="relative flex-1 flex flex-col justify-between overflow-hidden rounded-3xl border border-[var(--border-soft)] p-6 sm:p-9 lg:p-12 transition-transform duration-150 will-change-transform"
       >
-        {/* Right-Corner Half-Visible Proportional ASCII GitHub Background (No Raw Image) */}
-        <AsciiPortrait />
-
-        {/* Cursor Radial Spotlight illuminating the ASCII background */}
+        {/* Cursor Radial Spotlight illuminating the unified Milky Way background */}
         <div
           ref={spotlightRef}
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-[1] opacity-0 transition-opacity duration-300"
           style={{
             background:
-              "radial-gradient(circle 240px at var(--spot-x, 78%) var(--spot-y, 50%), rgba(var(--scene-glow-1), 0.18), transparent 72%)",
+              "radial-gradient(circle 260px at var(--spot-x, 76%) var(--spot-y, 48%), rgba(var(--scene-glow-1), 0.18), transparent 72%)",
           }}
         />
 

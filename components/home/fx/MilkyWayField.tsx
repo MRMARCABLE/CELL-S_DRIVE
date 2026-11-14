@@ -38,28 +38,28 @@ export default function MilkyWayField() {
     };
     resize();
 
-    const stars: GalaxyStar[] = Array.from({ length: 210 }, (_, i) => {
+    const stars: GalaxyStar[] = Array.from({ length: 240 }, (_, i) => {
       const arm = i % 3;
-      const normR = (i / 210) ** 0.82;
+      const normR = (i / 240) ** 0.8;
       return {
         arm,
         normR,
-        baseAngle: (arm * (Math.PI * 2)) / 3 + normR * 4.2,
-        angleJitter: ((i * 29) % 19 - 9) * 0.032,
-        speed: 0.0022 + (1 - normR) * 0.0038,
+        baseAngle: (arm * (Math.PI * 2)) / 3 + normR * 4.4,
+        angleJitter: ((i * 29) % 19 - 9) * 0.034,
+        speed: 0.0026 + (1 - normR) * 0.0042,
         glyph: GALAXY_GLYPHS[i % GALAXY_GLYPHS.length],
-        size: normR < 0.2 ? 12 : 9 + (i % 3) * 1.5,
-        isCoreWarm: normR < 0.28 || i % 9 === 0,
+        size: normR < 0.18 ? 13 : 9.5 + (i % 3) * 1.5,
+        isCoreWarm: normR < 0.32 || i % 8 === 0,
       };
     });
 
     let rafId = 0;
     let lastTime = 0;
     let currentXRatio = 0.72;
-    let currentYRatio = 0.48;
+    let currentYRatio = 0.47;
 
     const draw = (now: number) => {
-      if (now - lastTime < 36) {
+      if (now - lastTime < 34) {
         rafId = requestAnimationFrame(draw);
         return;
       }
@@ -70,24 +70,25 @@ export default function MilkyWayField() {
       const w = canvas.width;
       const h = canvas.height;
 
-      // Target galaxy position shifts right on Scene 01 (Hero), drifts softly on 02..05, and re-centers on 06
+      // Single unified Milky Way: anchored to the right side of Hero (Scene 01),
+      // drifting softly in the background on 02..05, and re-centering on 06
       const targetXRatio =
         activeScene === "01"
           ? w >= 1024
-            ? 0.73
-            : 0.65
+            ? 0.72
+            : 0.66
           : activeScene === "06"
             ? 0.5
             : 0.62;
-      const targetYRatio = activeScene === "01" ? 0.48 : 0.5;
+      const targetYRatio = activeScene === "01" ? 0.47 : 0.5;
 
       currentXRatio += (targetXRatio - currentXRatio) * 0.06;
       currentYRatio += (targetYRatio - currentYRatio) * 0.06;
 
       const cx = w * currentXRatio;
       const cy = h * currentYRatio;
-      const maxRadius = Math.min(w, h) * (activeScene === "01" ? 0.48 : 0.44);
-      const sceneAlphaBoost = activeScene === "01" ? 1 : 0.55;
+      const maxRadius = Math.min(w, h) * (activeScene === "01" ? 0.54 : 0.46);
+      const sceneAlphaBoost = activeScene === "01" ? 1.05 : 0.52;
 
       ctx.clearRect(0, 0, w, h);
 
@@ -95,44 +96,53 @@ export default function MilkyWayField() {
       const coreGlow = ctx.createRadialGradient(
         cx,
         cy,
-        4,
+        2,
         cx,
         cy,
-        maxRadius * 0.68
+        maxRadius * 0.65
       );
       if (isDark) {
         coreGlow.addColorStop(
           0,
-          `rgba(255, 148, 48, ${0.18 * sceneAlphaBoost})`
+          `rgba(255, 225, 165, ${0.34 * sceneAlphaBoost})`
         );
         coreGlow.addColorStop(
-          0.32,
-          `rgba(255, 94, 20, ${0.08 * sceneAlphaBoost})`
+          0.2,
+          `rgba(255, 140, 36, ${0.22 * sceneAlphaBoost})`
         );
         coreGlow.addColorStop(
-          0.68,
-          `rgba(126, 200, 176, ${0.05 * sceneAlphaBoost})`
+          0.55,
+          `rgba(126, 200, 176, ${0.08 * sceneAlphaBoost})`
         );
         coreGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
       } else {
         coreGlow.addColorStop(
           0,
-          `rgba(234, 88, 12, ${0.13 * sceneAlphaBoost})`
+          `rgba(20, 18, 16, ${0.26 * sceneAlphaBoost})`
         );
         coreGlow.addColorStop(
-          0.35,
-          `rgba(217, 119, 6, ${0.06 * sceneAlphaBoost})`
+          0.22,
+          `rgba(234, 88, 12, ${0.18 * sceneAlphaBoost})`
         );
         coreGlow.addColorStop(
-          0.7,
-          `rgba(47, 111, 94, ${0.04 * sceneAlphaBoost})`
+          0.58,
+          `rgba(47, 111, 94, ${0.07 * sceneAlphaBoost})`
         );
         coreGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
       }
       ctx.fillStyle = coreGlow;
       ctx.beginPath();
-      ctx.arc(cx, cy, maxRadius * 0.68, 0, Math.PI * 2);
+      ctx.arc(cx, cy, maxRadius * 0.65, 0, Math.PI * 2);
       ctx.fill();
+
+      // Center Dancing Star Nucleus of the single Milky Way
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.font = "bold 16px monospace";
+      ctx.fillStyle = isDark
+        ? `rgba(255, 245, 220, ${Math.min(0.95, 0.85 * sceneAlphaBoost)})`
+        : `rgba(20, 18, 16, ${Math.min(0.9, 0.8 * sceneAlphaBoost)})`;
+      ctx.fillText("✦", cx, cy);
 
       // Tilted Milky Way Spiral Plane Projection
       const tilt = 0.46;
