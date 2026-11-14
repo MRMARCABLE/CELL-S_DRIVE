@@ -23,6 +23,7 @@ export interface LocalizedContent {
   nav: {
     overview: string;
     projects: string;
+    cv: string;
   };
   quotes: {
     chaosStar: string;
@@ -72,6 +73,12 @@ export interface LocalizedContent {
     clearFilter: string;
     inspectSpec: string;
     closeSpec: string;
+    cmdPaletteHint: string;
+    cmdPalettePlaceholder: string;
+    sfxOn: string;
+    sfxOff: string;
+    systemPipelineLabel: string;
+    printCvBtn: string;
   };
   hero: {
     sectionLabel: string;
@@ -80,6 +87,7 @@ export interface LocalizedContent {
     bio: string;
     exploreProjects: string;
     contactMe: string;
+    viewCv: string;
   };
   sections: {
     focusHeading: string;
@@ -128,6 +136,7 @@ export const translations: Record<Locale, LocalizedContent> = {
     nav: {
       overview: "Overview",
       projects: "Projects",
+      cv: "CV",
     },
     quotes: {
       chaosStar:
@@ -178,10 +187,17 @@ export const translations: Record<Locale, LocalizedContent> = {
       emailCopiedBtn: "Copied ✓",
       replayIntroBtn: "Replay Intro",
       shortcutsFooter:
-        "SHORTCUTS: [T] Theme · [L] Lang · [/] CLI · [1-6] Scene · [G P] Projects",
+        "SHORTCUTS: [⌘K / ?] Palette · [T] Theme · [L] Lang · [M] SFX · [/] CLI · [1-6] Scene",
       clearFilter: "Show all",
       inspectSpec: "Inspect Spec",
       closeSpec: "Hide Spec",
+      cmdPaletteHint: "Command Palette",
+      cmdPalettePlaceholder:
+        "Search scenes, project specs, or system commands...",
+      sfxOn: "SFX: ON",
+      sfxOff: "SFX: OFF",
+      systemPipelineLabel: "SYSTEM ARCHITECTURE PIPELINE",
+      printCvBtn: "Print / Save PDF",
     },
     hero: {
       sectionLabel: "01 // DEVELOPER PROFILE",
@@ -190,6 +206,7 @@ export const translations: Record<Locale, LocalizedContent> = {
       bio: profile.bio,
       exploreProjects: "Explore Project Suite",
       contactMe: "Contact Me",
+      viewCv: "CV / Resume",
     },
     sections: {
       focusHeading: "02 // Engineering & Research Focus",
@@ -245,6 +262,7 @@ export const translations: Record<Locale, LocalizedContent> = {
     nav: {
       overview: "Ringkasan",
       projects: "Proyek",
+      cv: "CV",
     },
     quotes: {
       chaosStar:
@@ -295,10 +313,17 @@ export const translations: Record<Locale, LocalizedContent> = {
       emailCopiedBtn: "Disalin ✓",
       replayIntroBtn: "Putar Ulang Intro",
       shortcutsFooter:
-        "PINTASAN: [T] Tema · [L] Bahasa · [/] CLI · [1-6] Scene · [G P] Proyek",
+        "PINTASAN: [⌘K / ?] Palet · [T] Tema · [L] Bahasa · [M] SFX · [/] CLI · [1-6] Scene",
       clearFilter: "Tampilkan semua",
       inspectSpec: "Lihat Spesifikasi",
       closeSpec: "Tutup",
+      cmdPaletteHint: "Palet Perintah",
+      cmdPalettePlaceholder:
+        "Cari scene, spesifikasi proyek, atau perintah sistem...",
+      sfxOn: "SFX: ON",
+      sfxOff: "SFX: OFF",
+      systemPipelineLabel: "PIPELINE ARSITEKTUR SISTEM",
+      printCvBtn: "Cetak / Simpan PDF",
     },
     hero: {
       sectionLabel: "01 // PROFIL PENGEMBANG",
@@ -307,6 +332,7 @@ export const translations: Record<Locale, LocalizedContent> = {
       bio: "Mahasiswa Teknik Informatika di Universitas Katolik Widya Mandala Surabaya yang berfokus pada pengembangan web full-stack modern, desain UI/UX berbasis User-Centered Design (UCD), serta sistem cerdas yang memadukan robotika mikrokontroler (IoT) dengan Generative AI.",
       exploreProjects: "Lihat Suite Proyek",
       contactMe: "Hubungi Saya",
+      viewCv: "CV / Resume",
     },
     sections: {
       focusHeading: "02 // Fokus Rekayasa & Riset",
@@ -453,6 +479,12 @@ export const translations: Record<Locale, LocalizedContent> = {
           "Orkestrasi alur kerja LLM multi-tahap dengan Langflow",
           "Penyimpanan konteks & pencarian dokumen semantik berbasis vektor di Astra DB",
         ],
+        architecture: [
+          "Kueri Audit",
+          "Orkestrator Langflow",
+          "IBM watsonx LLM",
+          "Astra DB Vector RAG",
+        ],
       },
       {
         ...baseProjects[1],
@@ -460,6 +492,12 @@ export const translations: Record<Locale, LocalizedContent> = {
         highlights: [
           "Deteksi koordinat wajah real-time dengan Python, OpenCV & MediaPipe",
           "Komunikasi serial ke ESP32 untuk aktuasi servo 2-axis & tampilan OLED",
+        ],
+        architecture: [
+          "Umpan Kamera",
+          "OpenCV + MediaPipe",
+          "Jalur Serial UART",
+          "ESP32 Servo + OLED",
         ],
       },
       {
@@ -469,6 +507,12 @@ export const translations: Record<Locale, LocalizedContent> = {
           "Ruang Kartesius 3D interaktif yang dirender dengan Three.js & React",
           "Kontrol parameter langsung untuk transformasi dan proyeksi vektor",
         ],
+        architecture: [
+          "Kontrol Vektor",
+          "Matriks State React",
+          "Scene Graph Three.js",
+          "Render Kanvas WebGL",
+        ],
       },
       {
         ...baseProjects[3],
@@ -476,6 +520,12 @@ export const translations: Record<Locale, LocalizedContent> = {
         highlights: [
           "Analisis kebutuhan pengguna dan arsitektur informasi berbasis UCD",
           "Sistem komponen desain dan prototipe interaktif high-fidelity di Figma",
+        ],
+        architecture: [
+          "Riset Pengguna UCD",
+          "Arsitektur Informasi",
+          "Sistem Desain Figma",
+          "Prototipe Interaktif",
         ],
       },
       {
@@ -485,6 +535,12 @@ export const translations: Record<Locale, LocalizedContent> = {
           "Parsing webhook Telegram berbasis event dan kategorisasi pengeluaran di n8n",
           "Pencatatan otomatis dan laporan ringkas ke spreadsheet",
         ],
+        architecture: [
+          "Webhook Telegram",
+          "Alur Event n8n",
+          "Parser Pengeluaran",
+          "Sinkronisasi Spreadsheet",
+        ],
       },
       {
         ...baseProjects[5],
@@ -492,6 +548,26 @@ export const translations: Record<Locale, LocalizedContent> = {
         highlights: [
           "Analisis fitur dan pipeline prapemrosesan data dengan Python",
           "Evaluasi model klasifikasi/regresi prediktif untuk dukungan akademik dini",
+        ],
+        architecture: [
+          "Dataset Akademik",
+          "Prapemrosesan Python",
+          "Ekstraksi Fitur",
+          "Model Prediktif",
+        ],
+      },
+      {
+        ...baseProjects[6],
+        desc: "Portofolio rekayasa pribadi interaktif bergaya sesi terminal yang dibangun dengan Next.js 16 App Router, menampilkan 6 scene dinamis, kartu remi 3D, grafik git & PCB SVG, serta shell CLI dwibahasa.",
+        highlights: [
+          "Mesin token CSS dwi-tema (Shadow & Bone) dengan siluet atmosferik per scene",
+          "Shell interaktif marca-sh, kartu RGB 3D, dan sintetisator Web Audio taktil",
+        ],
+        architecture: [
+          "Next.js 16 App Router",
+          "Mesin State Scene",
+          "Kanvas & Grafik SVG",
+          "Shell CLI Dwibahasa",
         ],
       },
     ],

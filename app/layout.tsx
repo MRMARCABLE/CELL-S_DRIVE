@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import Navbar from "@/components/Navbar";
+import CommandPalette from "@/components/shell/CommandPalette";
 import CursorFollower from "@/components/shell/CursorFollower";
 import FooterBar from "@/components/shell/FooterBar";
 import HotkeysController from "@/components/shell/HotkeysController";
@@ -57,6 +58,8 @@ const themeInitScript = `
     else document.documentElement.classList.add('dark');
     var l = localStorage.getItem('locale');
     if (l === 'id' || l === 'en') document.documentElement.lang = l;
+    var s = localStorage.getItem('marca_sfx');
+    if (s === 'on') document.documentElement.dataset.sfx = 'on';
   } catch (e) {}
 `;
 
@@ -85,6 +88,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <HotkeysController />
           <TabTitleController />
           <CursorFollower />
+          <CommandPalette />
           <Navbar />
 
           <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-6 py-10 lg:py-12">

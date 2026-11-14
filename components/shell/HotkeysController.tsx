@@ -3,6 +3,8 @@
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
+import { openCommandPalette } from "@/components/shell/CommandPalette";
+import { playSfx, toggleSfx } from "@/components/shell/sound";
 
 function isInteractiveInput(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -29,20 +31,41 @@ export default function HotkeysController() {
       const key = e.key.toLowerCase();
       const now = Date.now();
 
-      // Chord: G then P -> /projects, G then H -> /
+      // Chord: G then P -> /projects, G then H -> /, G then C -> /cv
       if (now - lastGTimeRef.current < 900) {
         if (key === "p") {
           e.preventDefault();
           lastGTimeRef.current = 0;
+          playSfx("cmd");
           router.push("/projects");
           return;
         }
         if (key === "h") {
           e.preventDefault();
           lastGTimeRef.current = 0;
+          playSfx("cmd");
           router.push("/");
           return;
         }
+        if (key === "c") {
+          e.preventDefault();
+          lastGTimeRef.current = 0;
+          playSfx("cmd");
+          router.push("/cv");
+          return;
+        }
+      }
+
+      if (e.key === "?") {
+        e.preventDefault();
+        openCommandPalette();
+        return;
+      }
+
+      if (key === "m") {
+        e.preventDefault();
+        toggleSfx();
+        return;
       }
 
       if (key === "g") {

@@ -4,9 +4,12 @@ import ScrollProgressBar from "@/components/shell/ScrollProgressBar";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import LanguageToggle from "@/components/LanguageToggle";
+import SfxToggle from "@/components/SfxToggle";
+import { openCommandPalette } from "@/components/shell/CommandPalette";
+import { playSfx } from "@/components/shell/sound";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const SCENE_ITEMS = [
@@ -44,10 +47,32 @@ export default function Navbar() {
     getSceneServerSnapshot
   );
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handlePointerDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    window.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      window.removeEventListener("keydown", handleKey);
+    };
+  }, [menuOpen]);
 
   const navItems = [
     { index: "01", label: t.nav.overview, href: "/" },
     { index: "02", label: t.nav.projects, href: "/projects" },
+    { index: "03", label: t.nav.cv, href: "/cv" },
   ];
 
   const currentSceneObj =
@@ -55,6 +80,7 @@ export default function Navbar() {
 
   const jumpToScene = (id: string) => {
     setMenuOpen(false);
+    playSfx("cmd");
     const el = document.getElementById(`scene-${id}`);
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -77,7 +103,7 @@ export default function Navbar() {
 
           {/* Live Scene Indicator & Quick-Jump Dropdown on Home */}
           {pathname === "/" ? (
-            <div className="relative hidden sm:block">
+            <div ref={menuRef} className="relative hidden sm:block">
               <button
                 type="button"
                 onClick={() => setMenuOpen((prev) => !prev)}
@@ -145,6 +171,17 @@ export default function Navbar() {
             );
           })}
 
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            title={`${t.sceneUi.cmdPaletteHint} [Ctrl+K / ?]`}
+            aria-label={t.sceneUi.cmdPaletteHint}
+            className="hidden sm:inline-flex items-center gap-1 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2 py-1.5 font-mono text-xs text-[var(--text-secondary)] hover:border-[var(--accent-border)] hover:text-[var(--accent-text)] transition cursor-pointer"
+          >
+            <span>⌘K</span>
+          </button>
+
+          <SfxToggle />
           <LanguageToggle />
           <ThemeToggle />
 

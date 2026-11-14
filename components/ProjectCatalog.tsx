@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
+import { playSfx } from "@/components/shell/sound";
 import type { ProjectCategory } from "@/data/portfolio";
 
 const categories: Array<"All" | ProjectCategory> = [
@@ -33,6 +34,18 @@ export default function ProjectCatalog() {
     ? rawCategory
     : "All";
   const selectedTech = searchParams.get("tech")?.trim() || null;
+  const specParam = searchParams.get("spec")?.trim() || null;
+
+  const activeInspectedId = inspectedId ?? specParam;
+
+  const clearSpecParam = () => {
+    setInspectedId(null);
+    if (!specParam) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("spec");
+    const qs = params.toString();
+    router.replace(qs ? `/projects?${qs}` : "/projects", { scroll: false });
+  };
 
   const setFilter = (nextCategory: "All" | ProjectCategory) => {
     const params = new URLSearchParams();
@@ -74,24 +87,32 @@ export default function ProjectCatalog() {
     );
   });
 
-  const inspectedIndex = inspectedId
-    ? filteredProjects.findIndex((p) => p.id === inspectedId)
+  const inspectedIndex = activeInspectedId
+    ? filteredProjects.findIndex((p) => p.id === activeInspectedId)
     : -1;
   const inspectedProject =
     inspectedIndex >= 0
       ? filteredProjects[inspectedIndex]
-      : t.projects.find((p) => p.id === inspectedId) ?? null;
+      : t.projects.find((p) => p.id === activeInspectedId) ?? null;
 
   useEffect(() => {
-    if (!inspectedId) return;
+    if (!activeInspectedId) return;
     const handleKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setInspectedId(null);
+        if (specParam) {
+          const params = new URLSearchParams(searchParams.toString());
+          params.delete("spec");
+          const qs = params.toString();
+          router.replace(qs ? `/projects?${qs}` : "/projects", {
+            scroll: false,
+          });
+        }
       }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [inspectedId]);
+  }, [activeInspectedId, router, searchParams, specParam]);
 
   return (
     <section className="space-y-5">
@@ -217,7 +238,10 @@ export default function ProjectCatalog() {
                 <div className="flex items-center gap-3">
                   <button
                     type="button"
-                    onClick={() => setInspectedId(item.id)}
+                    onClick={() => {
+                      playSfx("open");
+                      setInspectedId(item.id);
+                    }}
                     data-cursor="inspect"
                     className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 font-mono text-[11px] text-[var(--text-secondary)] hover:border-[var(--accent-border)] hover:text-[var(--accent-text)] transition cursor-pointer"
                   >
@@ -243,7 +267,7 @@ export default function ProjectCatalog() {
       {inspectedProject ? (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-          onClick={() => setInspectedId(null)}
+          onClick={clearSpecParam}
           role="presentation"
         >
           <div
@@ -266,7 +290,7 @@ export default function ProjectCatalog() {
               </div>
               <button
                 type="button"
-                onClick={() => setInspectedId(null)}
+                onClick={clearSpecParam}
                 className="shrink-0 rounded-md border border-[var(--border-soft)] bg-[var(--bg-surface)] px-2.5 py-1 font-mono text-[11px] text-[var(--text-secondary)] hover:border-[var(--accent-border)] hover:text-[var(--text-primary)] transition cursor-pointer"
               >
                 {t.sceneUi.closeSpec} [ESC]
@@ -296,6 +320,33 @@ export default function ProjectCatalog() {
                 <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
                   {inspectedProject.desc}
                 </p>
+              </div>
+
+              {/* System Architecture Pipeline Diagram */}
+              <div className="space-y-2.5 rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/80 p-4">
+                <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[var(--accent-text)]">
+                  {t.sceneUi.systemPipelineLabel}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                  {inspectedProject.architecture.map((stage, idx) => (
+                    <div
+                      key={stage}
+                      className="relative flex items-center justify-between sm:flex-col sm:items-start gap-1.5 rounded-lg border border-[var(--border-soft)] bg-[var(--bg-surface)] px-3 py-2.5 font-mono"
+                    >
+                      <div className="flex w-full items-center justify-between text-[10px] text-[var(--text-muted)]">
+                        <span>{`STAGE_0${idx + 1}`}</span>
+                        {idx < inspectedProject.architecture.length - 1 ? (
+                          <span className="text-[var(--accent-text)]">→</span>
+                        ) : (
+                          <span className="text-[var(--accent-text)]">✦</span>
+                        )}
+                      </div>
+                      <div className="text-xs font-semibold text-[var(--text-primary)] leading-snug">
+                        {stage}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div className="space-y-2 rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/65 p-4">

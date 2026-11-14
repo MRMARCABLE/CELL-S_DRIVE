@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
+import { playSfx } from "@/components/shell/sound";
 import type { ProjectItem } from "@/data/portfolio";
 
 function getBusDomainTag(busId: string): string {
@@ -46,11 +47,79 @@ function getBusColorClasses(busId: string): {
 }
 
 function normalizeTechNeedle(skill: string): string {
-  if (skill.startsWith("Next.js")) return "React";
+  if (skill.startsWith("Next.js")) return "Next.js";
   if (skill.startsWith("ESP32")) return "ESP32";
   if (skill.startsWith("UI/UX")) return "UI/UX";
   if (skill.startsWith("Git")) return "Git";
   return skill;
+}
+
+function getSkillRoleNote(skill: string, locale: "en" | "id"): string {
+  const notesEn: Record<string, string> = {
+    "Next.js (App Router)":
+      "App Router architecture, SSR/CSR streaming & dynamic route shells.",
+    React:
+      "Interactive state engines, custom hooks & declarative UI composition.",
+    TypeScript:
+      "Strict static typing across full-stack data contracts & UI components.",
+    "Tailwind CSS":
+      "Custom CSS design tokens, dual-theme surfaces & responsive grid systems.",
+    "Three.js":
+      "Real-time WebGL 3D Cartesian scenes, vector projections & shaders.",
+    Python:
+      "Computer vision pipelines, serial hardware telemetry & ML preprocessing.",
+    Langflow:
+      "Multi-step autonomous AI agent orchestration & prompt chaining.",
+    "Astra DB":
+      "Vector database indexing & semantic RAG document retrieval.",
+    n8n: "Event-driven webhook automation & Telegram-to-spreadsheet workflows.",
+    OpenCV:
+      "Real-time camera frame processing, bounding boxes & spatial tracking.",
+    MediaPipe:
+      "High-speed facial landmark detection & coordinate extraction.",
+    "ESP32 / IoT":
+      "Microcontroller firmware, 2-axis pan-tilt servo control & OLED display.",
+    "UI/UX Design (UCD)":
+      "User-Centered Design research, wireframing & usability flows.",
+    Figma:
+      "Component token libraries, interactive prototypes & layout systems.",
+    "Git & GitLab":
+      "Dual-remote version control across GitHub & UKWMS Git-Eng.",
+  };
+
+  const notesId: Record<string, string> = {
+    "Next.js (App Router)":
+      "Arsitektur App Router, streaming SSR/CSR & rute dinamis.",
+    React:
+      "Mesin state interaktif, custom hooks & komposisi antarmuka deklaratif.",
+    TypeScript:
+      "Pengetikan statis ketat untuk kontrak data & komponen UI.",
+    "Tailwind CSS":
+      "Token desain CSS kustom, dwi-tema Shadow/Bone & tata letak responsif.",
+    "Three.js":
+      "Visualisasi ruang 3D WebGL real-time, proyeksi vektor & permukaan.",
+    Python:
+      "Pipeline visi komputer, telemetri serial perangkat keras & prapemrosesan ML.",
+    Langflow:
+      "Orkestrasi agen AI otonom multi-tahap & rantai prompt LLM.",
+    "Astra DB":
+      "Basis data vektor & pencarian dokumen semantik berbasis RAG.",
+    n8n: "Otomasi webhook berbasis event & integrasi bot Telegram ke spreadsheet.",
+    OpenCV:
+      "Pemrosesan frame kamera real-time & pelacakan koordinat objek.",
+    MediaPipe:
+      "Deteksi titik wajah berkecepatan tinggi untuk aktuasi robotika.",
+    "ESP32 / IoT":
+      "Firmware mikrokontroler, kontrol servo pan-tilt 2-axis & layar OLED.",
+    "UI/UX Design (UCD)":
+      "Riset pengguna berbasis UCD, arsitektur informasi & alur interaksi.",
+    Figma:
+      "Pustaka komponen desain, token visual & prototipe interaktif.",
+    "Git & GitLab":
+      "Kontrol versi repositori ganda di GitHub & Git-Eng UKWMS.",
+  };
+
+  return (locale === "id" ? notesId[skill] : notesEn[skill]) ?? skill;
 }
 
 function findMatchingProjects(
@@ -69,7 +138,7 @@ function findMatchingProjects(
 }
 
 export default function StackScene() {
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const [activeBus, setActiveBus] = useState<string | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<{
     skill: string;
@@ -296,13 +365,14 @@ export default function StackScene() {
                           key={skill}
                           type="button"
                           data-cursor="key"
-                          onClick={() =>
+                          onClick={() => {
+                            playSfx("key");
                             setSelectedSkill({
                               skill,
                               busId: group.id,
                               pinHex,
-                            })
-                          }
+                            });
+                          }}
                           onMouseEnter={() =>
                             setSelectedSkill({
                               skill,
@@ -346,39 +416,45 @@ export default function StackScene() {
         </div>
 
         {/* Bottom Live Kernel Module Telemetry & Project Cross-Link Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-4 py-3 font-mono text-xs">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded bg-[var(--accent-bg)] px-2 py-0.5 text-[10px] font-semibold text-[var(--accent-text)] border border-[var(--accent-border)]">
-              {`MODINFO // ${selectedSkill.pinHex}`}
-            </span>
-            <span className="font-semibold text-[var(--text-primary)]">
-              {selectedSkill.skill}
-            </span>
-            <span className="text-[var(--text-muted)]">—</span>
-            <span className="text-[var(--text-secondary)]">
-              {activeCategoryLabel}
+        <div className="rounded-2xl border border-[var(--border-soft)] bg-[var(--bg-elevated)] p-4 font-mono text-xs space-y-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded bg-[var(--accent-bg)] px-2 py-0.5 text-[10px] font-semibold text-[var(--accent-text)] border border-[var(--accent-border)]">
+                {`MODINFO // ${selectedSkill.pinHex}`}
+              </span>
+              <span className="font-semibold text-[var(--text-primary)]">
+                {selectedSkill.skill}
+              </span>
+              <span className="text-[var(--text-muted)]">—</span>
+              <span className="text-[var(--text-secondary)]">
+                {activeCategoryLabel}
+              </span>
+            </div>
+            <span className="text-[11px] text-[var(--accent-text)]">
+              {`${selectedSkill.busId} → ${getBusDomainTag(selectedSkill.busId)}`}
             </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 text-[11px]">
-            {matches.length > 0 ? (
-              <>
-                <span className="text-[var(--text-muted)]">
-                  {`${t.sceneUi.usedInProjects}:`}
-                </span>
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-t border-[var(--border-soft)] pt-2.5 text-[11px]">
+            <p className="font-sans text-xs text-[var(--text-secondary)]">
+              {getSkillRoleNote(selectedSkill.skill, locale)}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-1.5 shrink-0">
+              <span className="text-[var(--text-muted)] mr-1">
+                {`${t.sceneUi.usedInProjects} (${matches.length}):`}
+              </span>
+              {matches.map((proj) => (
                 <Link
+                  key={proj.id}
                   href={`/projects?tech=${encodeURIComponent(needle)}`}
                   className="inline-flex items-center gap-1 rounded border border-[var(--accent-border)] bg-[var(--accent-bg)] px-2 py-0.5 text-[var(--accent-text)] hover:border-[var(--border-hover)] transition"
                 >
-                  <span>{matches[0].title}</span>
+                  <span>{`[${proj.id}] ${proj.title}`}</span>
                   <span>→</span>
                 </Link>
-              </>
-            ) : (
-              <span className="text-[var(--accent-text)]">
-                {`${selectedSkill.busId} → ${getBusDomainTag(selectedSkill.busId)}`}
-              </span>
-            )}
+              ))}
+            </div>
           </div>
         </div>
       </div>

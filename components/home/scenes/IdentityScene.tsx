@@ -159,9 +159,16 @@ export default function IdentityScene() {
               <span>{t.hero.exploreProjects}</span>
               <span className="font-mono">→</span>
             </Link>
+            <Link
+              href="/cv"
+              className="inline-flex items-center gap-2 rounded-md border border-[var(--accent-border)] bg-[var(--accent-bg)] px-4 py-2 text-sm font-medium text-[var(--accent-text)] hover:border-[var(--border-hover)] transition"
+            >
+              <span>{t.hero.viewCv}</span>
+              <span className="font-mono text-xs">⎙</span>
+            </Link>
             <a
               href={`mailto:${profile.email}`}
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--accent-border)] bg-[var(--accent-bg)] px-4 py-2 text-sm font-medium text-[var(--accent-text)] hover:border-[var(--border-hover)] transition"
+              className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-hover)] transition"
             >
               <span>{t.hero.contactMe}</span>
               <span className="font-mono text-xs">↗</span>

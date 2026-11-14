@@ -6,6 +6,7 @@ import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
 import BinaryField from "@/components/home/fx/BinaryField";
 import { useReducedMotion } from "@/components/home/fx/hooks/useReducedMotion";
+import { playSfx } from "@/components/shell/sound";
 import type { FocusDomain } from "@/data/portfolio";
 
 function getRgbCardClass(rgb: FocusDomain["rgb"]): string {
@@ -41,6 +42,7 @@ export default function FocusScene() {
   const [revealAll, setRevealAll] = useState(false);
 
   const toggleCard = (id: string) => {
+    playSfx("flip");
     setFlippedIds((prev) => ({
       ...prev,
       [id]: !prev[id],
@@ -48,6 +50,7 @@ export default function FocusScene() {
   };
 
   const handleRevealAll = () => {
+    playSfx("flip");
     const next = !revealAll;
     setRevealAll(next);
     if (!next) {

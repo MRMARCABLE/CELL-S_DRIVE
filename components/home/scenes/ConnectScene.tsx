@@ -1,9 +1,12 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BOOT_REPLAY_EVENT } from "@/components/home/BootSequence";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
+import { openCommandPalette } from "@/components/shell/CommandPalette";
+import { playSfx, toggleSfx } from "@/components/shell/sound";
 import { profile } from "@/data/portfolio";
 
 interface CliLogEntry {
@@ -17,6 +20,9 @@ const ALL_COMMANDS = [
   "help",
   "neofetch",
   "ls projects",
+  "cv",
+  "resume",
+  "palette",
   "sudo hire marcel",
   "quote",
   "chaos",
@@ -27,6 +33,8 @@ const ALL_COMMANDS = [
   "theme bone",
   "lang en",
   "lang id",
+  "sfx on",
+  "sfx off",
   "boot",
   "copy",
   "email --copy",
@@ -43,6 +51,7 @@ const QUICK_COMMANDS = [
   "help",
   "neofetch",
   "ls projects",
+  "cv",
   "sudo hire marcel",
   "chaos --overdrive",
   "theme shadow",
@@ -53,6 +62,7 @@ const QUICK_COMMANDS = [
 
 export default function ConnectScene() {
   const { t, locale, setLocale } = useLanguage();
+  const router = useRouter();
   const [input, setInput] = useState("");
   const [history, setHistory] = useState<string[]>(["status --channels"]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
@@ -120,6 +130,7 @@ export default function ConnectScene() {
     const trimmed = rawCmd.trim();
     if (!trimmed) return;
     const cmd = trimmed.toLowerCase();
+    playSfx("cmd");
 
     setHistory((prev) =>
       prev[prev.length - 1] === trimmed ? prev : [...prev.slice(-24), trimmed]
@@ -141,8 +152,11 @@ export default function ConnectScene() {
         "  1..5 | github..email   → Open mounted communication channels",
         "  copy | email --copy    → Copy yohanneslalopua@gmail.com to clipboard",
         "  ls projects            → List archived systems & prototypes",
+        "  cv | resume            → Open printable Academic & Engineering CV (/cv)",
+        "  palette                → Open Global Command Palette (Ctrl+K / ?)",
         "  theme shadow | bone    → Switch canvas between Shadow & Bone themes",
         "  lang en | id           → Switch session language (EN / ID)",
+        "  sfx on | off           → Enable/disable Web Audio tactile UI synth",
         "  boot                   → Replay full-screen vortex boot sequence",
         "  chaos | --overdrive    → Ignite binary star resonance burst",
         "  neofetch               → Display system & developer specifications",
@@ -152,6 +166,22 @@ export default function ConnectScene() {
         "  logout                 → Seal session & pulse final imprint",
         "  clear                  → Clear terminal buffer (↑/↓ history, TAB complete)",
       ];
+    } else if (cmd === "cv" || cmd === "resume") {
+      accent = true;
+      lines = ["OPENING_SPEC → Navigating to /cv (Printable Resume Sheet)..."];
+      router.push("/cv");
+    } else if (cmd === "palette") {
+      accent = true;
+      lines = ["HUD_OPEN → Launching Command Palette [Ctrl+K]..."];
+      openCommandPalette();
+    } else if (cmd === "sfx on") {
+      accent = true;
+      toggleSfx(true);
+      lines = ["AUDIO_SYNTH → Tactile UI SFX enabled."];
+    } else if (cmd === "sfx off") {
+      accent = true;
+      toggleSfx(false);
+      lines = ["AUDIO_SYNTH → Tactile UI SFX muted."];
     } else if (cmd === "neofetch") {
       accent = true;
       lines = [

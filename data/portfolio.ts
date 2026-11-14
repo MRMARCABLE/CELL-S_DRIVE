@@ -77,6 +77,7 @@ export interface ProjectItem {
   title: string;
   desc: string;
   highlights: string[];
+  architecture: string[];
   tech: string[];
   repoUrl: string;
 }
@@ -299,6 +300,12 @@ export const projects: ProjectItem[] = [
       "Multi-step LLM workflow orchestration with Langflow",
       "Vector-based context storage and semantic document retrieval via Astra DB",
     ],
+    architecture: [
+      "Audit Query",
+      "Langflow Orchestrator",
+      "IBM watsonx LLM",
+      "Astra DB Vector RAG",
+    ],
     tech: ["Langflow", "IBM watsonx", "Astra DB", "Generative AI"],
     repoUrl: "https://github.com/MRMARCABLE",
   },
@@ -316,6 +323,12 @@ export const projects: ProjectItem[] = [
     highlights: [
       "Real-time face coordinate detection with Python, OpenCV & MediaPipe",
       "Serial communication to ESP32 for 2-axis servo actuation & OLED feedback",
+    ],
+    architecture: [
+      "Camera Feed",
+      "OpenCV + MediaPipe",
+      "UART Serial Link",
+      "ESP32 Servo + OLED",
     ],
     tech: ["ESP32", "Python", "OpenCV", "MediaPipe"],
     repoUrl: "https://github.com/MRMARCABLE",
@@ -335,6 +348,12 @@ export const projects: ProjectItem[] = [
       "Interactive 3D Cartesian space rendered with Three.js & React",
       "Live parameter controls for vector transformations and projections",
     ],
+    architecture: [
+      "Vector Controls",
+      "React State Matrix",
+      "Three.js Scene Graph",
+      "WebGL Canvas Render",
+    ],
     tech: ["Three.js", "React", "TypeScript", "Tailwind CSS"],
     repoUrl: "https://github.com/MRMARCABLE",
   },
@@ -352,6 +371,12 @@ export const projects: ProjectItem[] = [
     highlights: [
       "User needs analysis and information architecture grounded in UCD",
       "Component design system and high-fidelity interactive prototype in Figma",
+    ],
+    architecture: [
+      "UCD Research",
+      "Information Architecture",
+      "Figma Design System",
+      "Interactive Prototype",
     ],
     tech: ["UI/UX Design", "Figma", "UCD", "Prototyping"],
     repoUrl: "https://github.com/MRMARCABLE",
@@ -371,6 +396,12 @@ export const projects: ProjectItem[] = [
       "Event-driven Telegram webhook parsing and expense categorization in n8n",
       "Automated structured logging and summary reporting to spreadsheets",
     ],
+    architecture: [
+      "Telegram Webhook",
+      "n8n Event Workflow",
+      "Expense Parser",
+      "Spreadsheet Sync",
+    ],
     tech: ["n8n", "Telegram Bot API", "Automation", "Spreadsheets"],
     repoUrl: "https://github.com/MRMARCABLE",
   },
@@ -389,8 +420,46 @@ export const projects: ProjectItem[] = [
       "Feature analysis and data preprocessing pipeline in Python",
       "Predictive classification/regression evaluation for early academic support",
     ],
+    architecture: [
+      "Academic Dataset",
+      "Python Preprocessing",
+      "Feature Extraction",
+      "Predictive Model",
+    ],
     tech: ["Python", "Machine Learning", "Data Analytics", "Jupyter"],
     repoUrl: "https://github.com/MRMARCABLE",
+  },
+  {
+    id: "07",
+    code: "CRAFT.OS // TERMINAL PORTFOLIO",
+    category: "UI/UX",
+    status: "LIVE SYSTEM",
+    year: "2026",
+    accent:
+      "text-sky-800 dark:text-sky-300/90 border-[var(--border-soft)] bg-sky-500/8",
+    borderHover: "",
+    title: "CELL-S_DRIVE v2.1 (Marca OS)",
+    desc: "Interactive terminal-inspired personal engineering portfolio built with Next.js 16 App Router, featuring 6 dynamic scenes, 3D playing cards, SVG git & PCB graphs, and a bilingual CLI shell.",
+    highlights: [
+      "Dual-theme (Shadow & Bone) CSS token engine with per-scene ambient silhouettes",
+      "Interactive marca-sh shell, 3D RGB playing cards, and custom Web Audio synth",
+    ],
+    architecture: [
+      "Next.js 16 App Router",
+      "Scene State Engine",
+      "Canvas & SVG Shaders",
+      "Bilingual CLI Shell",
+    ],
+    tech: [
+      "Next.js (App Router)",
+      "React",
+      "TypeScript",
+      "Tailwind CSS",
+      "UI/UX Design (UCD)",
+      "Figma",
+      "Git & GitLab",
+    ],
+    repoUrl: "https://github.com/MRMARCABLE/CELL-S_DRIVE",
   },
 ];
 

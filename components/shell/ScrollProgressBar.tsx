@@ -43,10 +43,14 @@ export default function ScrollProgressBar() {
     >
       <div
         ref={barRef}
-        style={{ transform: "scaleX(0)", transformOrigin: "left center" }}
-        className="h-full w-full bg-[var(--accent-text)] opacity-75 transition-[background-color] duration-300"
+        style={{
+          transform: "scaleX(0)",
+          transformOrigin: "left center",
+          backgroundColor: "rgb(var(--scene-glow-1))",
+          boxShadow: "0 0 10px rgba(var(--scene-glow-1), 0.75)",
+        }}
+        className="h-full w-full opacity-90 transition-colors duration-500"
       />
     </div>
   );
 }
-
