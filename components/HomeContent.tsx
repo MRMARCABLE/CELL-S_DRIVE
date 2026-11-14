@@ -7,6 +7,8 @@ import ScenePrompt from "@/components/home/ScenePrompt";
 import { useActiveScene } from "@/components/home/fx/hooks/useActiveScene";
 import FocusScene from "@/components/home/scenes/FocusScene";
 import IdentityScene from "@/components/home/scenes/IdentityScene";
+import JourneyScene from "@/components/home/scenes/JourneyScene";
+import StackScene from "@/components/home/scenes/StackScene";
 import { credlyBadges, profile } from "@/data/portfolio";
 
 export default function HomeContent() {
@@ -24,126 +26,10 @@ export default function HomeContent() {
       <FocusScene />
 
       {/* 03 // EXPERIENCE & EDUCATION */}
-      <section
-        id="scene-03"
-        data-scene-index="03"
-        className="scene-stage"
-      >
-        <ScenePrompt
-          index="03"
-          command="git log --graph --all"
-          badge={t.sections.expBadge}
-          subtitle={t.sections.expHeading}
-        />
-
-        <div className="grid gap-4 lg:grid-cols-5">
-          {/* Experience Column */}
-          <div className="lg:col-span-3 space-y-3">
-            {t.experiences.map((exp) => (
-              <div
-                key={exp.id}
-                className="soft-card soft-card-interactive rounded-2xl p-5 space-y-3"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="rounded border border-[var(--accent-border)] bg-[var(--accent-bg)] px-2 py-0.5 font-mono text-[10px] text-[var(--accent-text)]">
-                    {exp.type}
-                  </span>
-                  <span className="font-mono text-xs text-[var(--text-muted)]">
-                    {exp.period}
-                  </span>
-                </div>
-
-                <div>
-                  <h3 className="text-base font-semibold text-[var(--text-primary)]">
-                    {exp.role}
-                  </h3>
-                  <p className="font-mono text-xs text-[var(--text-secondary)] mt-0.5">
-                    {exp.organization}
-                  </p>
-                </div>
-
-                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                  {exp.summary}
-                </p>
-
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {exp.skills.map((skill) => (
-                    <span
-                      key={skill}
-                      className="rounded border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2 py-0.5 font-mono text-[10px] text-[var(--text-secondary)]"
-                    >
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Education Column */}
-          <div className="lg:col-span-2 space-y-3">
-            {t.education.map((edu) => (
-              <div
-                key={edu.id}
-                className="soft-card soft-card-interactive rounded-2xl p-5 space-y-2.5"
-              >
-                <div className="flex items-center justify-between font-mono text-[11px] text-[var(--text-muted)]">
-                  <span>{`EDU // ${edu.id}`}</span>
-                  <span className="text-[var(--text-secondary)]">
-                    {edu.period}
-                  </span>
-                </div>
-                <h3 className="text-base font-semibold text-[var(--text-primary)] leading-snug">
-                  {edu.institution}
-                </h3>
-                <p className="text-xs font-medium text-[var(--accent-text)]">
-                  {edu.degree}
-                </p>
-                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                  {edu.note}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <JourneyScene />
 
       {/* 04 // TECH STACK MATRIX */}
-      <section
-        id="scene-04"
-        data-scene-index="04"
-        className="scene-stage"
-      >
-        <ScenePrompt
-          index="04"
-          command="lsmod --matrix"
-          badge={t.sections.stackBadge}
-          subtitle={t.sections.stackHeading}
-        />
-
-        <div className="grid gap-4 sm:grid-cols-3">
-          {t.techCategories.map((group) => (
-            <div
-              key={group.id}
-              className="soft-card rounded-2xl p-5 space-y-3"
-            >
-              <h3 className="font-mono text-xs text-[var(--text-secondary)]">
-                {group.category}
-              </h3>
-              <div className="flex flex-wrap gap-2">
-                {group.items.map((skill) => (
-                  <span
-                    key={skill}
-                    className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 text-xs text-[var(--text-primary)] hover:border-[var(--border-hover)] transition"
-                  >
-                    {skill}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <StackScene />
 
       {/* 05 // VERIFIED CREDENTIALS & CERTIFICATES */}
       <section
