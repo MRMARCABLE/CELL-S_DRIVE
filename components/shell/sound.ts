@@ -1,6 +1,6 @@
 "use client";
 
-export type SfxKind = "key" | "flip" | "cmd" | "open";
+export type SfxKind = "key" | "flip" | "cmd" | "open" | "pulse" | "bigbang";
 
 const SFX_STORAGE_KEY = "marca_sfx";
 
@@ -86,6 +86,24 @@ export function playSfx(kind: SfxKind, forcePlay = false): void {
     gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.038);
     osc.start(now);
     osc.stop(now + 0.04);
+  } else if (kind === "pulse") {
+    // Rising star instability pulse
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(540, now + 0.065);
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+    osc.start(now);
+    osc.stop(now + 0.075);
+  } else if (kind === "bigbang") {
+    // Deep cosmic boom + shimmer sweep
+    osc.type = "sawtooth";
+    osc.frequency.setValueAtTime(160, now);
+    osc.frequency.exponentialRampToValueAtTime(42, now + 0.38);
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+    osc.start(now);
+    osc.stop(now + 0.42);
   } else {
     // HUD / Command Palette open chime
     osc.type = "sine";

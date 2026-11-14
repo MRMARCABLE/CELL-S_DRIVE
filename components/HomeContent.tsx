@@ -1,6 +1,7 @@
 "use client";
 
 import BootSequence from "@/components/home/BootSequence";
+import MilkyWayField from "@/components/home/fx/MilkyWayField";
 import { useActiveScene } from "@/components/home/fx/hooks/useActiveScene";
 import ConnectScene from "@/components/home/scenes/ConnectScene";
 import CredentialsScene from "@/components/home/scenes/CredentialsScene";
@@ -15,6 +16,7 @@ export default function HomeContent() {
 
   return (
     <>
+      <MilkyWayField />
       <SceneRail />
       <BootSequence />
 

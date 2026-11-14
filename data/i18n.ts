@@ -33,6 +33,8 @@ export interface LocalizedContent {
   boot: {
     skipLabel: string;
     initializing: string;
+    tapPrompt: string;
+    bigBangLabel: string;
   };
   sceneUi: {
     verifiedIdentity: string;
@@ -146,8 +148,10 @@ export const translations: Record<Locale, LocalizedContent> = {
         "I was here — and the world will never be the same, because I chose not to live half-heartedly.",
     },
     boot: {
-      skipLabel: "Skip Intro [ESC]",
+      skipLabel: "Skip [ESC]",
       initializing: "CALIBRATING CHAOS MATRIX // NRP 5803025050",
+      tapPrompt: "TAP OR SCROLL TO DESTABILIZE THE STAR",
+      bigBangLabel: "BIG BANG IGNITED // FORMING BINARY MILKY WAY",
     },
     sceneUi: {
       verifiedIdentity: "IDENTITY_VERIFIED ✓",
@@ -272,8 +276,10 @@ export const translations: Record<Locale, LocalizedContent> = {
         "Aku pernah ada di sini, dan dunia tidak akan pernah sama lagi karena aku memilih untuk tidak hidup dengan setengah hati.",
     },
     boot: {
-      skipLabel: "Lewati Intro [ESC]",
+      skipLabel: "Lewati [ESC]",
       initializing: "MENGKALIBRASI MATRIKS KEKACAUAN // NRP 5803025050",
+      tapPrompt: "KETUK ATAU SCROLL UNTUK MEMICU INTI BINTANG",
+      bigBangLabel: "BIG BANG MELEDAK // MEMBENTUK GALAKSI BINER",
     },
     sceneUi: {
       verifiedIdentity: "IDENTITAS TERVERIFIKASI ✓",
