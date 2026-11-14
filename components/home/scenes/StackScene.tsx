@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
+import type { ProjectItem } from "@/data/portfolio";
 
 function getBusDomainTag(busId: string): string {
   if (busId === "BUS_01") return "WEB.3D_UX ♠";
@@ -14,6 +16,7 @@ function getBusColorClasses(busId: string): {
   led: string;
   badge: string;
   activeBorder: string;
+  stroke: string;
 } {
   if (busId === "BUS_01") {
     return {
@@ -21,6 +24,7 @@ function getBusColorClasses(busId: string): {
       badge:
         "border-sky-500/40 bg-sky-500/10 text-sky-800 dark:text-sky-300",
       activeBorder: "border-sky-500/55",
+      stroke: "rgba(56, 189, 248, 0.7)",
     };
   }
   if (busId === "BUS_02") {
@@ -29,6 +33,7 @@ function getBusColorClasses(busId: string): {
       badge:
         "border-rose-500/40 bg-rose-500/10 text-rose-800 dark:text-rose-300",
       activeBorder: "border-rose-500/55",
+      stroke: "rgba(251, 113, 133, 0.7)",
     };
   }
   return {
@@ -36,7 +41,31 @@ function getBusColorClasses(busId: string): {
     badge:
       "border-emerald-500/40 bg-emerald-500/10 text-emerald-800 dark:text-emerald-300",
     activeBorder: "border-emerald-500/55",
+    stroke: "rgba(52, 211, 153, 0.7)",
   };
+}
+
+function normalizeTechNeedle(skill: string): string {
+  if (skill.startsWith("Next.js")) return "React";
+  if (skill.startsWith("ESP32")) return "ESP32";
+  if (skill.startsWith("UI/UX")) return "UI/UX";
+  if (skill.startsWith("Git")) return "Git";
+  return skill;
+}
+
+function findMatchingProjects(
+  skill: string,
+  projects: ProjectItem[]
+): { needle: string; matches: ProjectItem[] } {
+  const needle = normalizeTechNeedle(skill);
+  const lower = needle.toLowerCase();
+  const matches = projects.filter(
+    (p) =>
+      p.tech.some((item) => item.toLowerCase().includes(lower)) ||
+      p.desc.toLowerCase().includes(lower) ||
+      p.title.toLowerCase().includes(lower)
+  );
+  return { needle, matches };
 }
 
 export default function StackScene() {
@@ -76,6 +105,11 @@ export default function StackScene() {
     t.techCategories[0]?.category ??
     "";
 
+  const { needle, matches } = useMemo(
+    () => findMatchingProjects(selectedSkill.skill, t.projects),
+    [selectedSkill.skill, t.projects]
+  );
+
   return (
     <section id="scene-04" data-scene-index="04" className="scene-stage">
       <ScenePrompt
@@ -85,7 +119,7 @@ export default function StackScene() {
         badge={t.sections.stackBadge}
       />
 
-      <div className="soft-card rounded-3xl p-5 sm:p-7 space-y-6">
+      <div className="soft-card rounded-3xl p-5 sm:p-7 space-y-5">
         {/* Top Hardware Bus Selector Bar */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[var(--border-soft)] pb-4">
           <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
@@ -131,6 +165,89 @@ export default function StackScene() {
           </span>
         </div>
 
+        {/* Desktop SVG PCB Copper Trace Router */}
+        <div aria-hidden="true" className="hidden lg:block -my-2">
+          <svg
+            viewBox="0 0 900 44"
+            className="h-9 w-full overflow-visible"
+            preserveAspectRatio="none"
+          >
+            {/* Central controller hub */}
+            <circle
+              cx="450"
+              cy="6"
+              r="4"
+              fill="var(--accent-text)"
+            />
+
+            {/* Trace to BUS_01 (Left Column center ~150) */}
+            <path
+              d="M 450 6 L 450 18 L 150 18 L 150 42"
+              fill="none"
+              stroke={
+                activeBus === null || activeBus === "BUS_01"
+                  ? "rgba(56, 189, 248, 0.55)"
+                  : "var(--border-soft)"
+              }
+              strokeWidth={activeBus === "BUS_01" ? "2.4" : "1.5"}
+            />
+            <circle
+              cx="150"
+              cy="40"
+              r="3.5"
+              fill={
+                activeBus === null || activeBus === "BUS_01"
+                  ? "rgba(56, 189, 248, 0.9)"
+                  : "var(--border-soft)"
+              }
+            />
+
+            {/* Trace to BUS_02 (Center Column ~450) */}
+            <path
+              d="M 450 6 L 450 42"
+              fill="none"
+              stroke={
+                activeBus === null || activeBus === "BUS_02"
+                  ? "rgba(251, 113, 133, 0.55)"
+                  : "var(--border-soft)"
+              }
+              strokeWidth={activeBus === "BUS_02" ? "2.4" : "1.5"}
+            />
+            <circle
+              cx="450"
+              cy="40"
+              r="3.5"
+              fill={
+                activeBus === null || activeBus === "BUS_02"
+                  ? "rgba(251, 113, 133, 0.9)"
+                  : "var(--border-soft)"
+              }
+            />
+
+            {/* Trace to BUS_03 (Right Column center ~750) */}
+            <path
+              d="M 450 6 L 450 18 L 750 18 L 750 42"
+              fill="none"
+              stroke={
+                activeBus === null || activeBus === "BUS_03"
+                  ? "rgba(52, 211, 153, 0.55)"
+                  : "var(--border-soft)"
+              }
+              strokeWidth={activeBus === "BUS_03" ? "2.4" : "1.5"}
+            />
+            <circle
+              cx="750"
+              cy="40"
+              r="3.5"
+              fill={
+                activeBus === null || activeBus === "BUS_03"
+                  ? "rgba(52, 211, 153, 0.9)"
+                  : "var(--border-soft)"
+              }
+            />
+          </svg>
+        </div>
+
         {/* 3 Circuit Bus Columns */}
         <div className="grid gap-5 lg:grid-cols-3">
           {busesWithPins.map((group) => {
@@ -153,9 +270,7 @@ export default function StackScene() {
                   {/* Bus Header */}
                   <div className="flex items-center justify-between border-b border-[var(--border-soft)] pb-3 font-mono text-xs">
                     <div className="flex items-center gap-2">
-                      <span
-                        className={`h-2 w-2 rounded-full ${colors.led}`}
-                      />
+                      <span className={`h-2 w-2 rounded-full ${colors.led}`} />
                       <span className="font-semibold text-[var(--text-primary)]">
                         {group.busCode}
                       </span>
@@ -180,6 +295,7 @@ export default function StackScene() {
                         <button
                           key={skill}
                           type="button"
+                          data-cursor="key"
                           onClick={() =>
                             setSelectedSkill({
                               skill,
@@ -229,8 +345,8 @@ export default function StackScene() {
           })}
         </div>
 
-        {/* Bottom Live Kernel Module Telemetry Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-4 py-3 font-mono text-xs">
+        {/* Bottom Live Kernel Module Telemetry & Project Cross-Link Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-2xl border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-4 py-3 font-mono text-xs">
           <div className="flex flex-wrap items-center gap-2">
             <span className="rounded bg-[var(--accent-bg)] px-2 py-0.5 text-[10px] font-semibold text-[var(--accent-text)] border border-[var(--accent-border)]">
               {`MODINFO // ${selectedSkill.pinHex}`}
@@ -244,8 +360,25 @@ export default function StackScene() {
             </span>
           </div>
 
-          <div className="flex items-center gap-2 text-[11px] text-[var(--accent-text)]">
-            <span>{`${selectedSkill.busId} → ${getBusDomainTag(selectedSkill.busId)}`}</span>
+          <div className="flex flex-wrap items-center gap-2 text-[11px]">
+            {matches.length > 0 ? (
+              <>
+                <span className="text-[var(--text-muted)]">
+                  {`${t.sceneUi.usedInProjects}:`}
+                </span>
+                <Link
+                  href={`/projects?tech=${encodeURIComponent(needle)}`}
+                  className="inline-flex items-center gap-1 rounded border border-[var(--accent-border)] bg-[var(--accent-bg)] px-2 py-0.5 text-[var(--accent-text)] hover:border-[var(--border-hover)] transition"
+                >
+                  <span>{matches[0].title}</span>
+                  <span>→</span>
+                </Link>
+              </>
+            ) : (
+              <span className="text-[var(--accent-text)]">
+                {`${selectedSkill.busId} → ${getBusDomainTag(selectedSkill.busId)}`}
+              </span>
+            )}
           </div>
         </div>
       </div>

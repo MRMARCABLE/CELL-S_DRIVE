@@ -1,5 +1,7 @@
 "use client";
 
+import ScrollProgressBar from "@/components/shell/ScrollProgressBar";
+
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useSyncExternalStore } from "react";
@@ -156,6 +158,7 @@ export default function Navbar() {
           </a>
         </div>
       </nav>
+      <ScrollProgressBar />
     </header>
   );
 }

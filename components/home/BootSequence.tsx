@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import { useReducedMotion } from "@/components/home/fx/hooks/useReducedMotion";
 
@@ -11,12 +11,16 @@ export const BOOT_REPLAY_EVENT = "marca-boot-replay";
 // navigating back from /projects via Next <Link> feels instant.
 let hasBootedInTab = false;
 
-const CHAOS_LINES = [
-  "01001101 01000001 01010010 01000011 01000001 // INIT_CORE",
-  "SYS.NRP::5803025050 >> MOUNTING /dev/chaos_star [OK]",
-  "LOADING MODULE: AI.AGENT ♦ // SYS.EMBED ♣ // WEB.3D_UX ♠",
-  "01110011 01110100 01100001 01110010 :: ENTROPY -> HARMONY",
-];
+const CHAOS_GLYPHS = ["0", "1", "✦", "+", "*", "0", "1", "·"];
+
+interface ChaosParticle {
+  angle: number;
+  radius: number;
+  speed: number;
+  glyph: string;
+  size: number;
+  alpha: number;
+}
 
 export default function BootSequence() {
   const { t } = useLanguage();
@@ -26,6 +30,13 @@ export default function BootSequence() {
   const [phase, setPhase] = useState<"chaos" | "coalesce">("chaos");
   const [progress, setProgress] = useState(12);
   const [runCount, setRunCount] = useState(0);
+
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const phaseRef = useRef<"chaos" | "coalesce">("chaos");
+
+  useEffect(() => {
+    phaseRef.current = phase;
+  }, [phase]);
 
   const dismiss = useCallback(() => {
     hasBootedInTab = true;
@@ -87,6 +98,78 @@ export default function BootSequence() {
     };
   }, [dismiss, reducedMotion, runCount, visible]);
 
+  // Chaos -> Dancing Star Particle Vortex Canvas
+  useEffect(() => {
+    if (!visible || reducedMotion) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const resize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    };
+    resize();
+
+    const particles: ChaosParticle[] = Array.from({ length: 84 }, (_, i) => ({
+      angle: (i / 84) * Math.PI * 2 + (i % 5) * 0.3,
+      radius: 90 + ((i * 37) % Math.max(180, Math.min(canvas.width, canvas.height) * 0.45)),
+      speed: (i % 2 === 0 ? 1 : -1) * (0.012 + (i % 7) * 0.004),
+      glyph: CHAOS_GLYPHS[i % CHAOS_GLYPHS.length],
+      size: 11 + (i % 3) * 2,
+      alpha: 0.25 + (i % 4) * 0.14,
+    }));
+
+    let rafId = 0;
+
+    const render = () => {
+      const isDark = document.documentElement.classList.contains("dark");
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const isCoalesce = phaseRef.current === "coalesce";
+
+      for (const p of particles) {
+        p.angle += isCoalesce ? p.speed * 2.2 : p.speed;
+        if (isCoalesce) {
+          p.radius = Math.max(18, p.radius * 0.91);
+          p.alpha = Math.max(0.04, p.alpha * 0.95);
+        }
+
+        const x = cx + Math.cos(p.angle) * p.radius;
+        const y = cy + Math.sin(p.angle) * p.radius;
+
+        ctx.font = `${p.size}px monospace`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        if (p.glyph === "✦") {
+          ctx.fillStyle = isDark
+            ? `rgba(126, 200, 176, ${Math.min(0.85, p.alpha + 0.35)})`
+            : `rgba(47, 111, 94, ${Math.min(0.8, p.alpha + 0.3)})`;
+        } else {
+          ctx.fillStyle = isDark
+            ? `rgba(236, 238, 242, ${p.alpha})`
+            : `rgba(28, 25, 23, ${p.alpha})`;
+        }
+
+        ctx.fillText(p.glyph, x, y);
+      }
+
+      rafId = requestAnimationFrame(render);
+    };
+
+    rafId = requestAnimationFrame(render);
+    window.addEventListener("resize", resize, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      window.removeEventListener("resize", resize);
+    };
+  }, [reducedMotion, runCount, visible]);
+
   useEffect(() => {
     if (!visible) return;
 
@@ -109,12 +192,19 @@ export default function BootSequence() {
       aria-modal="true"
       aria-label="Terminal Boot Sequence"
       onClick={dismiss}
-      className={`fixed inset-0 z-[80] flex flex-col justify-between bg-[var(--bg-base)]/95 backdrop-blur-xl px-6 py-8 sm:px-12 sm:py-10 transition-opacity duration-300 cursor-pointer select-none ${
+      className={`fixed inset-0 z-[80] flex flex-col justify-between bg-[var(--bg-base)]/95 backdrop-blur-xl px-6 py-8 sm:px-12 sm:py-10 transition-opacity duration-300 cursor-pointer select-none overflow-hidden ${
         fadingOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
+      {/* Vortex Canvas Layer */}
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 z-0 h-full w-full"
+      />
+
       {/* Top terminal bar */}
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between gap-4 border-b border-[var(--border-soft)] pb-3 font-mono text-xs">
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between gap-4 border-b border-[var(--border-soft)] pb-3 font-mono text-xs">
         <div className="flex items-center gap-2 text-[var(--text-secondary)]">
           <span className="inline-block h-2 w-2 rounded-full bg-[var(--accent-text)] animate-pulse" />
           <span className="text-[var(--accent-text)]">marca@ukwms:~$</span>
@@ -127,46 +217,46 @@ export default function BootSequence() {
             e.stopPropagation();
             dismiss();
           }}
-          className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 font-mono text-[11px] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
+          className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 font-mono text-[11px] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition cursor-pointer"
         >
           {t.boot.skipLabel}
         </button>
       </div>
 
       {/* Center Chaos -> Dancing Star Stage */}
-      <div className="mx-auto my-auto flex w-full max-w-3xl flex-col items-center text-center space-y-6">
-        {/* Star / Chaos Glyph */}
-        <div className="relative flex h-16 w-16 items-center justify-center rounded-2xl border border-[var(--accent-border)] bg-[var(--accent-bg)] font-mono text-2xl text-[var(--accent-text)] shadow-sm transition-transform duration-500">
+      <div className="relative z-10 mx-auto my-auto flex w-full max-w-3xl flex-col items-center text-center space-y-6">
+        <div
+          className={`relative flex h-20 w-20 items-center justify-center rounded-2xl border border-[var(--accent-border)] bg-[var(--accent-bg)] font-mono text-3xl text-[var(--accent-text)] shadow-md transition-all duration-500 ${
+            phase === "coalesce" ? "scale-110" : "scale-95"
+          }`}
+        >
           <span
             className={`transition-all duration-500 ${
               phase === "chaos"
-                ? "scale-90 rotate-45 opacity-80"
-                : "scale-110 rotate-0 opacity-100"
+                ? "rotate-45 opacity-80"
+                : "rotate-0 opacity-100"
             }`}
           >
             ✦
           </span>
         </div>
 
-        {phase === "chaos" ? (
-          <div className="w-full max-w-xl space-y-2 rounded-xl border border-[var(--border-soft)] bg-[var(--bg-surface)] p-4 text-left font-mono text-[11px] text-[var(--text-muted)]">
-            {CHAOS_LINES.map((line) => (
-              <div key={line} className="truncate">
-                <span className="text-[var(--accent-text)] mr-2">&gt;</span>
-                <span>{line}</span>
-              </div>
-            ))}
+        <div className="space-y-4 transition-all duration-500">
+          <div className="font-mono text-[11px] tracking-[0.24em] text-[var(--accent-text)] uppercase">
+            {phase === "chaos"
+              ? "ENTROPY -> COALESCING_STAR"
+              : "YOHANNES MARCEL LALOPUA // UKWMS INFORMATICS"}
           </div>
-        ) : (
-          <div className="space-y-4 transition-all duration-500">
-            <div className="font-mono text-[11px] tracking-[0.24em] text-[var(--accent-text)] uppercase">
-              YOHANNES MARCEL LALOPUA // UKWMS INFORMATICS
-            </div>
-            <blockquote className="max-w-2xl text-base sm:text-xl font-medium leading-relaxed text-[var(--text-primary)]">
-              {`“${t.quotes.chaosStar}”`}
-            </blockquote>
-          </div>
-        )}
+          <blockquote
+            className={`max-w-2xl text-base sm:text-xl font-medium leading-relaxed text-[var(--text-primary)] transition-all duration-500 ${
+              phase === "coalesce"
+                ? "opacity-100 translate-y-0"
+                : "opacity-75 translate-y-1"
+            }`}
+          >
+            {`“${t.quotes.chaosStar}”`}
+          </blockquote>
+        </div>
 
         {/* Progress indicator */}
         <div className="w-full max-w-md space-y-2">
@@ -184,11 +274,10 @@ export default function BootSequence() {
       </div>
 
       {/* Bottom footer hint */}
-      <div className="mx-auto flex w-full max-w-5xl items-center justify-between border-t border-[var(--border-soft)] pt-3 font-mono text-[11px] text-[var(--text-muted)]">
+      <div className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between border-t border-[var(--border-soft)] pt-3 font-mono text-[11px] text-[var(--text-muted)]">
         <span>CELL-S_DRIVE // SESSION_STAGE v2.0</span>
         <span>[CLICK ANYWHERE OR PRESS ESC TO CONTINUE]</span>
       </div>
     </div>
   );
 }
-

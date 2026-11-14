@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
 import BinaryField from "@/components/home/fx/BinaryField";
+import { useReducedMotion } from "@/components/home/fx/hooks/useReducedMotion";
 import type { FocusDomain } from "@/data/portfolio";
 
 function getRgbCardClass(rgb: FocusDomain["rgb"]): string {
@@ -19,9 +20,24 @@ function getRgbLabel(rgb: FocusDomain["rgb"]): string {
   return "CH_B // CYAN";
 }
 
+function getCourtRank(rgb: FocusDomain["rgb"]): string {
+  if (rgb === "r") return "A";
+  if (rgb === "g") return "K";
+  return "Q";
+}
+
+function getFanClass(idx: number, isOpen: boolean): string {
+  if (isOpen) return "lg:rotate-0 lg:translate-y-0";
+  if (idx === 0) return "lg:-rotate-1 lg:translate-y-1 hover:lg:rotate-0 hover:lg:translate-y-0";
+  if (idx === 2) return "lg:rotate-1 lg:translate-y-1 hover:lg:rotate-0 hover:lg:translate-y-0";
+  return "";
+}
+
 export default function FocusScene() {
   const { t } = useLanguage();
+  const reducedMotion = useReducedMotion();
   const [flippedIds, setFlippedIds] = useState<Record<string, boolean>>({});
+  const [hoveredRgb, setHoveredRgb] = useState<"r" | "g" | "b" | null>(null);
   const [revealAll, setRevealAll] = useState(false);
 
   const toggleCard = (id: string) => {
@@ -37,6 +53,29 @@ export default function FocusScene() {
     if (!next) {
       setFlippedIds({});
     }
+  };
+
+  const handleCardMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (reducedMotion) return;
+    const tiltTarget = e.currentTarget.querySelector(
+      ".playing-card-tilt"
+    ) as HTMLElement | null;
+    if (!tiltTarget) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const nx = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 .. 0.5
+    const ny = (e.clientY - rect.top) / rect.height - 0.5;
+    tiltTarget.style.setProperty("--tilt-x", `${(-ny * 8).toFixed(2)}deg`);
+    tiltTarget.style.setProperty("--tilt-y", `${(nx * 8).toFixed(2)}deg`);
+  };
+
+  const handleCardLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    setHoveredRgb(null);
+    const tiltTarget = e.currentTarget.querySelector(
+      ".playing-card-tilt"
+    ) as HTMLElement | null;
+    if (!tiltTarget) return;
+    tiltTarget.style.setProperty("--tilt-x", "0deg");
+    tiltTarget.style.setProperty("--tilt-y", "0deg");
   };
 
   return (
@@ -58,21 +97,22 @@ export default function FocusScene() {
       />
 
       {/* Binary Matrix Stage Container */}
-      <div className="relative overflow-hidden rounded-3xl border border-[var(--border-soft)] bg-[var(--bg-surface)]/65 p-5 sm:p-8">
-        {/* Background 0/1 Canvas */}
-        <BinaryField />
+      <div className="relative overflow-hidden rounded-3xl border border-[var(--border-soft)] bg-[var(--bg-surface)]/65 p-5 sm:p-8 lg:p-10">
+        {/* Background 0/1 Canvas reacting dynamically to hovered RGB channel */}
+        <BinaryField activeRgb={hoveredRgb} />
 
         {/* Helper bar */}
-        <div className="relative z-10 mb-6 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-[var(--text-muted)]">
+        <div className="relative z-10 mb-7 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-[var(--text-muted)]">
           <span>[RGB_DECK // 5:7 PLAYING CARD PROPORTION]</span>
           <span>{t.sceneUi.tapToFlip}</span>
         </div>
 
         {/* 3 Playing Cards Grid */}
-        <div className="relative z-10 grid gap-6 md:grid-cols-3">
-          {t.focusDomains.map((domain) => {
+        <div className="relative z-10 grid gap-6 md:grid-cols-3 py-1">
+          {t.focusDomains.map((domain, idx) => {
             const isOpen = revealAll || Boolean(flippedIds[domain.id]);
             const rgbClass = getRgbCardClass(domain.rgb);
+            const courtRank = getCourtRank(domain.rgb);
             const filteredProjectsHref = `/projects?category=${encodeURIComponent(
               domain.projectCategory
             )}`;
@@ -81,129 +121,140 @@ export default function FocusScene() {
               <div
                 key={domain.id}
                 data-open={isOpen ? "true" : "false"}
-                className="playing-card-perspective mx-auto w-full max-w-[330px]"
+                data-cursor="flip"
+                onMouseEnter={() => setHoveredRgb(domain.rgb)}
+                onMouseMove={handleCardMove}
+                onMouseLeave={handleCardLeave}
+                className={`playing-card-perspective mx-auto w-full max-w-[330px] transition-transform duration-300 ${getFanClass(
+                  idx,
+                  isOpen
+                )}`}
               >
-                <div
-                  role="button"
-                  tabIndex={0}
-                  aria-pressed={isOpen}
-                  aria-label={`${domain.code} — ${domain.title}`}
-                  onClick={() => toggleCard(domain.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      e.preventDefault();
-                      toggleCard(domain.id);
-                    }
-                  }}
-                  className={`playing-card-inner aspect-[5/7] w-full cursor-pointer select-none focus:outline-none ${
-                    isOpen ? "is-flipped" : ""
-                  }`}
-                >
-                  {/* CLOSED FACE (Front of Card before flip) */}
+                <div className="playing-card-tilt">
                   <div
-                    className={`playing-card-face ${rgbClass} flex flex-col justify-between rounded-2xl bg-[var(--bg-surface)]/95 p-5 backdrop-blur-md transition-shadow`}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={isOpen}
+                    aria-label={`${domain.code} — ${domain.title}`}
+                    onClick={() => toggleCard(domain.id)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        toggleCard(domain.id);
+                      }
+                    }}
+                    className={`playing-card-inner aspect-[5/7] w-full cursor-pointer select-none focus:outline-none ${
+                      isOpen ? "is-flipped" : ""
+                    }`}
                   >
-                    {/* Top Corner Index */}
-                    <div className="flex items-start justify-between font-mono">
-                      <div className="leading-none">
-                        <div className="text-lg font-bold text-[var(--card-rgb-text)]">
-                          {domain.id}
+                    {/* CLOSED FACE (Front of Card before flip) */}
+                    <div
+                      className={`playing-card-face ${rgbClass} flex flex-col justify-between rounded-2xl bg-[var(--bg-surface)]/95 p-5 backdrop-blur-md transition-shadow`}
+                    >
+                      {/* Top Corner Index */}
+                      <div className="flex items-start justify-between font-mono">
+                        <div className="leading-none">
+                          <div className="text-lg font-bold text-[var(--card-rgb-text)]">
+                            {courtRank}
+                          </div>
+                          <div className="mt-1 text-base text-[var(--card-rgb-text)]">
+                            {domain.suit}
+                          </div>
                         </div>
-                        <div className="mt-1 text-base text-[var(--card-rgb-text)]">
-                          {domain.suit}
-                        </div>
-                      </div>
-                      <span className="rounded border border-[var(--card-rgb-border)] bg-[var(--card-rgb-bg)] px-2 py-0.5 text-[10px] text-[var(--card-rgb-text)]">
-                        {getRgbLabel(domain.rgb)}
-                      </span>
-                    </div>
-
-                    {/* Center Emblem */}
-                    <div className="my-auto flex flex-col items-center text-center space-y-3 py-4">
-                      <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-[var(--card-rgb-border)] bg-[var(--card-rgb-bg)] font-mono text-4xl text-[var(--card-rgb-text)] shadow-inner">
-                        {domain.suit}
-                      </div>
-
-                      <div className="font-mono text-xs tracking-[0.2em] text-[var(--card-rgb-text)]">
-                        {domain.code}
-                      </div>
-
-                      <h3 className="px-2 text-base font-bold leading-snug text-[var(--text-primary)]">
-                        {domain.title}
-                      </h3>
-
-                      <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-3 py-1 font-mono text-[10px] text-[var(--text-muted)]">
-                        <span>{t.sceneUi.flipCardCue}</span>
-                      </div>
-                    </div>
-
-                    {/* Bottom Mirrored Corner Index */}
-                    <div className="flex items-end justify-between font-mono">
-                      <span className="text-[10px] text-[var(--text-muted)]">
-                        01001101 // DECK
-                      </span>
-                      <div className="rotate-180 leading-none text-right">
-                        <div className="text-lg font-bold text-[var(--card-rgb-text)]">
-                          {domain.id}
-                        </div>
-                        <div className="mt-1 text-base text-[var(--card-rgb-text)]">
-                          {domain.suit}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* OPEN FACE (Revealed Back of Card after 180deg flip) */}
-                  <div
-                    className={`playing-card-back ${rgbClass} flex flex-col justify-between rounded-2xl bg-[var(--bg-surface)] p-5 shadow-lg`}
-                  >
-                    {/* Header */}
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between border-b border-[var(--border-soft)] pb-2.5 font-mono text-xs">
-                        <span className="font-bold text-[var(--card-rgb-text)]">
-                          {`${domain.suit} ${domain.id} // ${domain.code}`}
-                        </span>
-                        <span className="rounded border border-[var(--card-rgb-border)] bg-[var(--card-rgb-bg)] px-1.5 py-0.5 text-[10px] text-[var(--card-rgb-text)]">
-                          {t.sceneUi.activeLabel}
+                        <span className="rounded border border-[var(--card-rgb-border)] bg-[var(--card-rgb-bg)] px-2 py-0.5 text-[10px] text-[var(--card-rgb-text)]">
+                          {getRgbLabel(domain.rgb)}
                         </span>
                       </div>
 
-                      <h3 className="text-base font-bold leading-snug text-[var(--text-primary)]">
-                        {domain.title}
-                      </h3>
+                      {/* Center Emblem */}
+                      <div className="my-auto flex flex-col items-center text-center space-y-3 py-4">
+                        <div className="flex h-20 w-20 items-center justify-center rounded-2xl border border-[var(--card-rgb-border)] bg-[var(--card-rgb-bg)] font-mono text-4xl text-[var(--card-rgb-text)] shadow-inner">
+                          {domain.suit}
+                        </div>
 
-                      <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
-                        {domain.desc}
-                      </p>
-                    </div>
+                        <div className="font-mono text-xs tracking-[0.2em] text-[var(--card-rgb-text)]">
+                          {`${domain.id} // ${domain.code}`}
+                        </div>
 
-                    {/* Architecture Highlights */}
-                    <div className="space-y-2 border-t border-[var(--border-soft)] pt-3">
-                      <div className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
-                        {t.sceneUi.keyCapabilities}
+                        <h3 className="px-2 text-base font-bold leading-snug text-[var(--text-primary)]">
+                          {domain.title}
+                        </h3>
+
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-3 py-1 font-mono text-[10px] text-[var(--text-muted)]">
+                          <span>{t.sceneUi.flipCardCue}</span>
+                        </div>
                       </div>
-                      <ul className="space-y-1.5 font-mono text-[11px] text-[var(--text-primary)]">
-                        {domain.highlights.map((item) => (
-                          <li key={item} className="flex items-center gap-2">
-                            <span className="text-[var(--card-rgb-text)]">▸</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
+
+                      {/* Bottom Mirrored Corner Index */}
+                      <div className="flex items-end justify-between font-mono">
+                        <span className="text-[10px] text-[var(--text-muted)]">
+                          01001101 // DECK
+                        </span>
+                        <div className="rotate-180 leading-none text-right">
+                          <div className="text-lg font-bold text-[var(--card-rgb-text)]">
+                            {courtRank}
+                          </div>
+                          <div className="mt-1 text-base text-[var(--card-rgb-text)]">
+                            {domain.suit}
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Footer Action */}
-                    <div className="flex items-center justify-between border-t border-[var(--border-soft)] pt-3 font-mono text-xs">
-                      <span className="text-[var(--card-rgb-text)]">
-                        {domain.suit}
-                      </span>
-                      <Link
-                        href={filteredProjectsHref}
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-[var(--card-rgb-text)] hover:underline"
-                      >
-                        {`${t.hero.exploreProjects} →`}
-                      </Link>
+                    {/* OPEN FACE (Revealed Back of Card after 180deg flip) */}
+                    <div
+                      className={`playing-card-back ${rgbClass} flex flex-col justify-between rounded-2xl bg-[var(--bg-surface)] p-5 shadow-lg`}
+                    >
+                      {/* Header */}
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between border-b border-[var(--border-soft)] pb-2.5 font-mono text-xs">
+                          <span className="font-bold text-[var(--card-rgb-text)]">
+                            {`${courtRank}${domain.suit} // ${domain.code}`}
+                          </span>
+                          <span className="rounded border border-[var(--card-rgb-border)] bg-[var(--card-rgb-bg)] px-1.5 py-0.5 text-[10px] text-[var(--card-rgb-text)]">
+                            {t.sceneUi.activeLabel}
+                          </span>
+                        </div>
+
+                        <h3 className="text-base font-bold leading-snug text-[var(--text-primary)]">
+                          {domain.title}
+                        </h3>
+
+                        <p className="text-xs leading-relaxed text-[var(--text-secondary)]">
+                          {domain.desc}
+                        </p>
+                      </div>
+
+                      {/* Architecture Highlights */}
+                      <div className="space-y-2 border-t border-[var(--border-soft)] pt-3">
+                        <div className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">
+                          {t.sceneUi.keyCapabilities}
+                        </div>
+                        <ul className="space-y-1.5 font-mono text-[11px] text-[var(--text-primary)]">
+                          {domain.highlights.map((item) => (
+                            <li key={item} className="flex items-center gap-2">
+                              <span className="text-[var(--card-rgb-text)]">
+                                ▸
+                              </span>
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Footer Action */}
+                      <div className="flex items-center justify-between border-t border-[var(--border-soft)] pt-3 font-mono text-xs">
+                        <span className="text-[var(--card-rgb-text)]">
+                          {domain.suit}
+                        </span>
+                        <Link
+                          href={filteredProjectsHref}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-[var(--card-rgb-text)] hover:underline"
+                        >
+                          {`${t.hero.exploreProjects} →`}
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -215,4 +266,3 @@ export default function FocusScene() {
     </section>
   );
 }
-

@@ -187,9 +187,21 @@ body {
   animation: terminal-blink 1.05s steps(1) infinite;
 }
 
-/* 3D Playing Card (5:7) Flip Mechanics */
+/* 3D Playing Card (5:7) Flip & Tilt Mechanics */
 .playing-card-perspective {
   perspective: 1200px;
+}
+
+.playing-card-tilt {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg)) translateY(var(--lift-y, 0px));
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.playing-card-perspective:hover .playing-card-tilt {
+  --lift-y: -6px;
 }
 
 .playing-card-inner {
@@ -204,10 +216,6 @@ body {
 .playing-card-perspective[data-open="true"] .playing-card-inner,
 .playing-card-inner.is-flipped {
   transform: rotateY(180deg);
-}
-
-.playing-card-perspective:not([data-open="true"]):hover .playing-card-inner:not(.is-flipped) {
-  transform: translateY(-6px);
 }
 
 .playing-card-face,
@@ -256,7 +264,7 @@ body {
   color: var(--card-rgb-text);
 }
 
-/* Holographic Badge Glint */
+/* Holographic Badge Glint & Cursor Foil Sheen */
 .holo-badge {
   position: relative;
   overflow: hidden;
@@ -269,9 +277,9 @@ body {
   background: linear-gradient(
     115deg,
     transparent 35%,
-    rgba(126, 200, 176, 0.22) 45%,
-    rgba(250, 204, 21, 0.24) 50%,
-    rgba(56, 189, 248, 0.22) 55%,
+    rgba(126, 200, 176, 0.24) 45%,
+    rgba(250, 204, 21, 0.26) 50%,
+    rgba(56, 189, 248, 0.24) 55%,
     transparent 65%
   );
   transform: translateX(-100%) rotate(12deg);
@@ -284,12 +292,50 @@ body {
   transform: translateX(100%) rotate(12deg);
 }
 
+.holo-card-foil {
+  position: relative;
+  overflow: hidden;
+}
+
+.holo-card-foil::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle 180px at var(--mx, 50%) var(--my, 50%),
+    rgba(126, 200, 176, 0.16),
+    rgba(56, 189, 248, 0.08) 40%,
+    transparent 70%
+  );
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+.holo-card-foil:hover::before {
+  opacity: 1;
+}
+
+/* Chaos Overdrive Easter Egg Mode */
+@keyframes chaos-pulse {
+  0%, 100% { filter: saturate(1); }
+  50% { filter: saturate(1.45) hue-rotate(28deg); }
+}
+
+html.chaos-overdrive .ambient-backdrop {
+  --scene-opacity: 0.28;
+  animation: chaos-pulse 1.5s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .playing-card-tilt,
   .playing-card-inner,
-  .holo-badge::after {
+  .holo-badge::after,
+  .holo-card-foil::before {
     transition: none !important;
   }
-  .cursor-blink {
+  .cursor-blink,
+  html.chaos-overdrive .ambient-backdrop {
     animation: none !important;
   }
 }

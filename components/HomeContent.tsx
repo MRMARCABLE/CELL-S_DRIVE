@@ -8,12 +8,14 @@ import FocusScene from "@/components/home/scenes/FocusScene";
 import IdentityScene from "@/components/home/scenes/IdentityScene";
 import JourneyScene from "@/components/home/scenes/JourneyScene";
 import StackScene from "@/components/home/scenes/StackScene";
+import SceneRail from "@/components/shell/SceneRail";
 
 export default function HomeContent() {
   useActiveScene();
 
   return (
     <div className="space-y-8">
+      <SceneRail />
       <BootSequence />
 
       {/* 01 // PROFILE & HERO */}

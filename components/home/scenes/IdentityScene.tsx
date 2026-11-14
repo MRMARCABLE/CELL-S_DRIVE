@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
 import AsciiPortrait from "@/components/home/fx/AsciiPortrait";
@@ -9,10 +10,31 @@ import { useReducedMotion } from "@/components/home/fx/hooks/useReducedMotion";
 import { useScrollProgress } from "@/components/home/fx/hooks/useScrollProgress";
 import { profile } from "@/data/portfolio";
 
+const SCRAMBLE_FRAMES = ["M4RC3L", "010101", "M✦RCEL", "MARC3L", "MARCEL"];
+
 export default function IdentityScene() {
   const { t } = useLanguage();
   const reducedMotion = useReducedMotion();
   const scrollProgress = useScrollProgress("scene-01");
+  const [nameLabel, setNameLabel] = useState("MARCEL");
+  const [scrambling, setScrambling] = useState(false);
+
+  useEffect(() => {
+    if (!scrambling || reducedMotion) return;
+    const timers: number[] = [];
+    SCRAMBLE_FRAMES.forEach((frame, idx) => {
+      const id = window.setTimeout(() => {
+        setNameLabel(frame);
+        if (idx === SCRAMBLE_FRAMES.length - 1) {
+          setScrambling(false);
+        }
+      }, idx * 75);
+      timers.push(id);
+    });
+    return () => {
+      timers.forEach((id) => window.clearTimeout(id));
+    };
+  }, [reducedMotion, scrambling]);
 
   // Begin phasing out as the user scrolls past the middle of Scene 01 toward Scene 02
   const phaseOut = reducedMotion
@@ -24,7 +46,7 @@ export default function IdentityScene() {
     : {
         transform: `translate3d(0, ${Math.round(-phaseOut * 20)}px, 0) scale(${(
           1 -
-          phaseOut * 0.05
+          phaseOut * 0.04
         ).toFixed(3)})`,
         opacity: Number((1 - phaseOut * 0.42).toFixed(3)),
       };
@@ -58,10 +80,15 @@ export default function IdentityScene() {
             {/* Giant Stacked Focal Name */}
             <h1
               aria-label={profile.name}
-              className="font-sans text-[clamp(2.4rem,6vw,4.6rem)] font-extrabold uppercase leading-[0.93] tracking-tighter text-[var(--text-primary)] select-none"
+              onMouseEnter={() => {
+                if (!reducedMotion && !scrambling) setScrambling(true);
+              }}
+              className="font-sans text-[clamp(2.4rem,6vw,4.9rem)] font-extrabold uppercase leading-[0.92] tracking-tighter text-[var(--text-primary)] select-none"
             >
               <span className="block">YOHANNES</span>
-              <span className="block text-[var(--accent-text)]">MARCEL</span>
+              <span className="block text-[var(--accent-text)] transition-colors">
+                {nameLabel}
+              </span>
               <span className="block">LALOPUA</span>
             </h1>
 
@@ -71,7 +98,10 @@ export default function IdentityScene() {
 
             {/* Philosophical Quote 1 (No attribution) */}
             <blockquote className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/70 px-4 py-3 font-mono text-xs sm:text-[13px] leading-relaxed text-[var(--text-secondary)]">
-              <span className="mr-2 text-[var(--accent-text)]" aria-hidden="true">
+              <span
+                className="mr-2 text-[var(--accent-text)]"
+                aria-hidden="true"
+              >
                 ✦
               </span>
               <span className="italic text-[var(--text-primary)]">
@@ -82,35 +112,37 @@ export default function IdentityScene() {
 
           {/* Right Column: Interactive ASCII Portrait + Verified Photo Chip */}
           <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
-            <div className="relative w-full max-w-[380px]">
+            <div className="relative w-full max-w-[430px]">
               <AsciiPortrait className="w-full" />
 
-              {/* Verified Real Photo Chip anchored on the ASCII Matrix */}
-              <div className="mt-3 sm:mt-0 sm:absolute sm:bottom-3 sm:left-3 flex items-center gap-3 rounded-xl border border-[var(--border-soft)] bg-[var(--bg-surface)]/95 backdrop-blur-md p-2 pr-3.5 shadow-md">
-                <div className="relative shrink-0">
-                  <Image
-                    src="/avatar.png"
-                    alt={`Profile photo of ${profile.name}`}
-                    width={48}
-                    height={48}
-                    priority
-                    className="h-12 w-12 rounded-lg object-cover border border-[var(--border-soft)]"
-                  />
-                  <span
-                    title={t.hero.availability}
-                    className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-[var(--bg-base)] bg-[var(--accent-text)]"
-                  />
+              {/* Verified Real Photo Chip anchored below/on the ASCII Matrix */}
+              <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-[var(--border-soft)] bg-[var(--bg-surface)]/95 backdrop-blur-md p-2.5 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="relative shrink-0">
+                    <Image
+                      src="/avatar.png"
+                      alt={`Profile photo of ${profile.name}`}
+                      width={44}
+                      height={44}
+                      priority
+                      className="h-11 w-11 rounded-lg object-cover border border-[var(--border-soft)]"
+                    />
+                    <span
+                      title={t.hero.availability}
+                      className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-[var(--bg-base)] bg-[var(--accent-text)]"
+                    />
+                  </div>
+                  <div className="font-mono text-[11px] leading-tight">
+                    <div className="font-semibold text-[var(--text-primary)]">
+                      @MRMARCABLE
+                    </div>
+                    <div className="text-[10px] text-[var(--text-muted)]">
+                      {profile.location}
+                    </div>
+                  </div>
                 </div>
-                <div className="font-mono text-[11px] leading-tight">
-                  <div className="font-semibold text-[var(--text-primary)]">
-                    @MRMARCABLE
-                  </div>
-                  <div className="text-[10px] text-[var(--text-muted)]">
-                    {profile.location}
-                  </div>
-                  <div className="text-[10px] text-[var(--accent-text)] mt-0.5">
-                    {t.sceneUi.verifiedIdentity}
-                  </div>
+                <div className="font-mono text-[10px] text-[var(--accent-text)] text-right">
+                  {t.sceneUi.verifiedIdentity}
                 </div>
               </div>
             </div>
@@ -166,8 +198,16 @@ export default function IdentityScene() {
             <span>↓</span>
           </a>
         </div>
+
+        {/* Bottom Scroll Phasing Haze toward Scene 02 */}
+        {!reducedMotion && phaseOut > 0.05 ? (
+          <div
+            aria-hidden="true"
+            style={{ opacity: Number((phaseOut * 0.85).toFixed(2)) }}
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[var(--accent-bg)] to-transparent transition-opacity"
+          />
+        ) : null}
       </div>
     </section>
   );
 }
-

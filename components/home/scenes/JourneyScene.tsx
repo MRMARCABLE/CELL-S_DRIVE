@@ -16,12 +16,17 @@ interface CommitNode {
   period: string;
   summary: string;
   skills: string[];
+  sortYear: number;
   isHead?: boolean;
 }
 
 export default function JourneyScene() {
   const { t, locale } = useLanguage();
   const [laneFilter, setLaneFilter] = useState<"all" | "exp" | "edu">("all");
+  const [sortMode, setSortMode] = useState<"tracks" | "chronological">("tracks");
+  const [inspectorView, setInspectorView] = useState<"summary" | "diff">(
+    "summary"
+  );
   const [selectedHash, setSelectedHash] = useState<string>("f580302");
 
   const commits = useMemo<CommitNode[]>(() => {
@@ -36,8 +41,15 @@ export default function JourneyScene() {
       period: edu.period,
       summary: edu.note,
       skills: edu.skills,
+      sortYear: idx === 0 ? 2025 : 2021,
       isHead: idx === 0,
     }));
+
+    const expYearMap: Record<string, number> = {
+      "01": 2023.3,
+      "02": 2023.2,
+      "03": 2022.9,
+    };
 
     const expNodes: CommitNode[] = t.experiences.map((exp) => ({
       uid: `exp-${exp.id}`,
@@ -50,17 +62,17 @@ export default function JourneyScene() {
       period: exp.period,
       summary: exp.summary,
       skills: exp.skills,
+      sortYear: expYearMap[exp.id] ?? 2022,
     }));
 
-    // Ordered from newest milestone (UKWMS 2025-Present, SMK 2021-2024, Fiesto Mar 2023, HIPPAST Feb 2023, CLS Dec 2022)
-    return [
-      eduNodes[0],
-      eduNodes[1],
-      expNodes[0],
-      expNodes[1],
-      expNodes[2],
-    ].filter(Boolean);
-  }, [locale, t.education, t.experiences]);
+    const all = [...eduNodes, ...expNodes];
+    if (sortMode === "chronological") {
+      return all.sort((a, b) => b.sortYear - a.sortYear);
+    }
+    return [eduNodes[0], eduNodes[1], expNodes[0], expNodes[1], expNodes[2]].filter(
+      Boolean
+    );
+  }, [locale, sortMode, t.education, t.experiences]);
 
   const visibleCommits = useMemo(() => {
     if (laneFilter === "all") return commits;
@@ -94,41 +106,78 @@ export default function JourneyScene() {
         subtitle={t.sections.expHeading}
         badge={t.sections.expBadge}
         rightSlot={
-          <div className="flex items-center gap-1 rounded-lg border border-[var(--border-soft)] bg-[var(--bg-elevated)] p-0.5 font-mono text-[11px]">
-            {(["all", "exp", "edu"] as const).map((filterKey) => {
-              const active = laneFilter === filterKey;
-              const label =
-                filterKey === "all"
-                  ? t.sceneUi.filterAll
-                  : filterKey === "exp"
-                    ? t.sceneUi.filterExp
-                    : t.sceneUi.filterEdu;
-              return (
-                <button
-                  key={filterKey}
-                  type="button"
-                  onClick={() => setLaneFilter(filterKey)}
-                  className={`rounded-md px-2 py-0.5 transition ${
-                    active
-                      ? "bg-[var(--accent-bg)] text-[var(--accent-text)] border border-[var(--accent-border)]"
-                      : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
-                  }`}
-                >
-                  {label}
-                </button>
-              );
-            })}
+          <div className="flex flex-wrap items-center gap-2">
+            {/* Sort Order Switch */}
+            <button
+              type="button"
+              onClick={() =>
+                setSortMode((prev) =>
+                  prev === "tracks" ? "chronological" : "tracks"
+                )
+              }
+              className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 font-mono text-[11px] text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition cursor-pointer"
+            >
+              {sortMode === "tracks"
+                ? t.sceneUi.groupedSort
+                : t.sceneUi.chronologicalSort}
+            </button>
+
+            {/* Branch Filter Pills */}
+            <div className="flex items-center gap-1 rounded-lg border border-[var(--border-soft)] bg-[var(--bg-elevated)] p-0.5 font-mono text-[11px]">
+              {(["all", "exp", "edu"] as const).map((filterKey) => {
+                const active = laneFilter === filterKey;
+                const label =
+                  filterKey === "all"
+                    ? t.sceneUi.filterAll
+                    : filterKey === "exp"
+                      ? t.sceneUi.filterExp
+                      : t.sceneUi.filterEdu;
+                return (
+                  <button
+                    key={filterKey}
+                    type="button"
+                    onClick={() => setLaneFilter(filterKey)}
+                    className={`rounded-md px-2 py-0.5 transition cursor-pointer ${
+                      active
+                        ? "bg-[var(--accent-bg)] text-[var(--accent-text)] border border-[var(--accent-border)]"
+                        : "text-[var(--text-muted)] hover:text-[var(--text-primary)]"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         }
       />
 
       <div className="grid gap-6 lg:grid-cols-12 items-start">
-        {/* Left Column: Interactive Git Commit Graph */}
-        <div className="lg:col-span-7 space-y-2.5">
+        {/* Left Column: Dual-Lane Interactive SVG Git Commit Graph */}
+        <div
+          className="lg:col-span-7 space-y-2.5"
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown" || e.key === "j") {
+              e.preventDefault();
+              stepCommit(1);
+            } else if (e.key === "ArrowUp" || e.key === "k") {
+              e.preventDefault();
+              stepCommit(-1);
+            }
+          }}
+        >
           {visibleCommits.map((node, index) => {
             const isSelected = activeCommit?.hash === node.hash;
             const isEdu = node.lane === "edu";
+            const isFirst = index === 0;
             const isLast = index === visibleCommits.length - 1;
+            const prevNode = visibleCommits[index - 1];
+            const nextNode = visibleCommits[index + 1];
+
+            // Coordinates for dual-lane SVG rail (52x120 viewBox preserved cleanly)
+            const xEdu = 14;
+            const xExp = laneFilter === "exp" ? 14 : 38;
+            const nodeX = isEdu ? xEdu : xExp;
 
             return (
               <div
@@ -136,6 +185,7 @@ export default function JourneyScene() {
                 role="button"
                 tabIndex={0}
                 aria-pressed={isSelected}
+                data-cursor="inspect"
                 onClick={() => setSelectedHash(node.hash)}
                 onMouseEnter={() => setSelectedHash(node.hash)}
                 onKeyDown={(e) => {
@@ -144,41 +194,106 @@ export default function JourneyScene() {
                     setSelectedHash(node.hash);
                   }
                 }}
-                className={`group relative flex items-stretch gap-3.5 sm:gap-4 rounded-2xl border p-4 sm:p-5 cursor-pointer transition-all focus:outline-none ${
+                className={`group relative flex items-stretch gap-3 sm:gap-4 rounded-2xl border p-4 sm:p-5 cursor-pointer transition-all focus:outline-none ${
                   isSelected
                     ? "border-[var(--accent-border)] bg-[var(--bg-surface)] shadow-md"
                     : "border-[var(--border-soft)] bg-[var(--bg-surface)]/70 hover:border-[var(--border-hover)]"
                 }`}
               >
-                {/* Dual-Lane Git Graph Rail */}
+                {/* Authentic Dual-Lane SVG Git Branch Track */}
                 <div
                   aria-hidden="true"
-                  className="relative flex w-9 shrink-0 flex-col items-center select-none font-mono text-xs"
+                  className="relative w-12 shrink-0 select-none"
                 >
-                  {/* Top vertical connector */}
-                  {index > 0 ? (
-                    <span className="h-3 w-px bg-[var(--border-hover)]" />
-                  ) : (
-                    <span className="h-3" />
-                  )}
+                  <svg
+                    viewBox="0 0 52 100"
+                    preserveAspectRatio="none"
+                    className="h-full w-full overflow-visible"
+                  >
+                    {/* Continuing main/edu track */}
+                    {laneFilter !== "exp" && (!isFirst || isEdu) && !isLast ? (
+                      <line
+                        x1={xEdu}
+                        y1={isFirst && isEdu ? 50 : 0}
+                        x2={xEdu}
+                        y2={100}
+                        stroke="rgba(16, 185, 129, 0.42)"
+                        strokeWidth="2"
+                      />
+                    ) : null}
 
-                  {/* Commit Node Circle */}
+                    {/* Incoming branch curve from prev commit if lane switched */}
+                    {prevNode && prevNode.lane !== node.lane ? (
+                      <path
+                        d={`M ${prevNode.lane === "edu" ? xEdu : xExp} 0 C ${
+                          prevNode.lane === "edu" ? xEdu : xExp
+                        } 25, ${nodeX} 25, ${nodeX} 50`}
+                        fill="none"
+                        stroke={
+                          isEdu
+                            ? "rgba(16, 185, 129, 0.55)"
+                            : "rgba(56, 189, 248, 0.55)"
+                        }
+                        strokeWidth="2"
+                      />
+                    ) : prevNode ? (
+                      <line
+                        x1={nodeX}
+                        y1="0"
+                        x2={nodeX}
+                        y2="50"
+                        stroke={
+                          isEdu
+                            ? "rgba(16, 185, 129, 0.5)"
+                            : "rgba(56, 189, 248, 0.5)"
+                        }
+                        strokeWidth="2"
+                      />
+                    ) : null}
+
+                    {/* Outgoing branch connector to next commit */}
+                    {nextNode && nextNode.lane !== node.lane ? (
+                      <path
+                        d={`M ${nodeX} 50 C ${nodeX} 75, ${
+                          nextNode.lane === "edu" ? xEdu : xExp
+                        } 75, ${nextNode.lane === "edu" ? xEdu : xExp} 100`}
+                        fill="none"
+                        stroke={
+                          nextNode.lane === "edu"
+                            ? "rgba(16, 185, 129, 0.55)"
+                            : "rgba(56, 189, 248, 0.55)"
+                        }
+                        strokeWidth="2"
+                      />
+                    ) : nextNode ? (
+                      <line
+                        x1={nodeX}
+                        y1="50"
+                        x2={nodeX}
+                        y2="100"
+                        stroke={
+                          isEdu
+                            ? "rgba(16, 185, 129, 0.5)"
+                            : "rgba(56, 189, 248, 0.5)"
+                        }
+                        strokeWidth="2"
+                      />
+                    ) : null}
+                  </svg>
+
+                  {/* Node Commit Glyph centered at y=50% */}
                   <span
-                    className={`relative z-10 flex h-6 w-6 items-center justify-center rounded-full border text-[11px] font-bold transition-transform ${
-                      isSelected ? "scale-110" : "group-hover:scale-105"
+                    style={{ left: `${(nodeX / 52) * 100}%` }}
+                    className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 flex h-6 w-6 items-center justify-center rounded-full border font-mono text-[11px] font-bold transition-transform ${
+                      isSelected ? "scale-115 shadow-sm" : "group-hover:scale-105"
                     } ${
                       isEdu
-                        ? "border-emerald-500/60 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                        : "border-sky-500/60 bg-sky-500/15 text-sky-700 dark:text-sky-300"
+                        ? "border-emerald-500/70 bg-[var(--bg-surface)] text-emerald-600 dark:text-emerald-300"
+                        : "border-sky-500/70 bg-[var(--bg-surface)] text-sky-600 dark:text-sky-300"
                     }`}
                   >
                     {isEdu ? "◆" : "●"}
                   </span>
-
-                  {/* Bottom vertical connector */}
-                  {!isLast ? (
-                    <span className="flex-1 w-px bg-[var(--border-soft)] group-hover:bg-[var(--border-hover)] my-1" />
-                  ) : null}
                 </div>
 
                 {/* Commit Summary Body */}
@@ -225,7 +340,7 @@ export default function JourneyScene() {
         {activeCommit ? (
           <div className="lg:col-span-5 lg:sticky lg:top-24 soft-card rounded-2xl overflow-hidden border border-[var(--border-soft)]">
             {/* Terminal Window Header */}
-            <div className="flex items-center justify-between border-b border-[var(--border-soft)] bg-[var(--bg-elevated)] px-4 py-3 font-mono text-xs">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[var(--border-soft)] bg-[var(--bg-elevated)] px-4 py-3 font-mono text-xs">
               <div className="flex items-center gap-2">
                 <span className="h-2.5 w-2.5 rounded-full bg-rose-500/70" />
                 <span className="h-2.5 w-2.5 rounded-full bg-amber-500/70" />
@@ -234,16 +349,43 @@ export default function JourneyScene() {
                   {`git show ${activeCommit.hash}`}
                 </span>
               </div>
-              <span className="text-[10px] text-[var(--text-muted)]">
-                {`${activeIndex + 1}/${visibleCommits.length}`}
-              </span>
+
+              <div className="flex items-center gap-1 rounded-md border border-[var(--border-soft)] bg-[var(--bg-surface)] p-0.5 text-[10px]">
+                <button
+                  type="button"
+                  onClick={() => setInspectorView("summary")}
+                  className={`rounded px-1.5 py-0.5 transition cursor-pointer ${
+                    inspectorView === "summary"
+                      ? "bg-[var(--accent-bg)] text-[var(--accent-text)] font-semibold"
+                      : "text-[var(--text-muted)]"
+                  }`}
+                >
+                  {t.sceneUi.summaryMode}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInspectorView("diff")}
+                  className={`rounded px-1.5 py-0.5 transition cursor-pointer ${
+                    inspectorView === "diff"
+                      ? "bg-[var(--accent-bg)] text-[var(--accent-text)] font-semibold"
+                      : "text-[var(--text-muted)]"
+                  }`}
+                >
+                  {t.sceneUi.diffMode}
+                </button>
+              </div>
             </div>
 
             {/* Commit Metadata & Diff Body */}
             <div className="p-5 space-y-4 font-mono text-xs">
               <div className="space-y-1 border-b border-[var(--border-soft)] pb-3 text-[11px]">
-                <div className="text-amber-700 dark:text-amber-300 font-semibold">
-                  {`commit ${activeCommit.hash}84b9e201f5803025050`}
+                <div className="flex items-center justify-between">
+                  <span className="text-amber-700 dark:text-amber-300 font-semibold">
+                    {`commit ${activeCommit.hash}84b9e201f5803025050`}
+                  </span>
+                  <span className="text-[10px] text-[var(--text-muted)]">
+                    {`${activeIndex + 1}/${visibleCommits.length}`}
+                  </span>
                 </div>
                 <div className="text-[var(--text-secondary)]">
                   {`Author: ${profile.name} <${profile.email}>`}
@@ -256,7 +398,7 @@ export default function JourneyScene() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <div className="font-sans text-base font-bold text-[var(--text-primary)]">
                   {activeCommit.title}
                 </div>
@@ -265,18 +407,37 @@ export default function JourneyScene() {
                 </div>
               </div>
 
-              {/* Diff block */}
-              <div className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/80 p-3.5 space-y-2 leading-relaxed">
-                <div className="text-[10px] text-[var(--text-muted)]">
-                  @@ -0,0 +1,4 @@ // SUMMARY_NOTES
+              {inspectorView === "diff" ? (
+                <div className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/85 p-3.5 space-y-1 text-[11px] leading-relaxed overflow-x-auto">
+                  <div className="text-[var(--text-muted)]">
+                    {`diff --git a/${activeCommit.branch} b/${activeCommit.branch}`}
+                  </div>
+                  <div className="text-[var(--text-muted)]">
+                    @@ -0,0 +1,4 @@ // MILESTONE_PATCH
+                  </div>
+                  <div className="text-emerald-700 dark:text-emerald-300">
+                    {`+ role: "${activeCommit.title}"`}
+                  </div>
+                  <div className="text-emerald-700 dark:text-emerald-300">
+                    {`+ org:  "${activeCommit.organization}"`}
+                  </div>
+                  <div className="text-emerald-700 dark:text-emerald-300">
+                    {`+ note: "${activeCommit.summary}"`}
+                  </div>
                 </div>
-                <p className="font-sans text-xs text-[var(--text-primary)] leading-relaxed">
-                  <span className="font-mono text-[var(--accent-text)] mr-1.5">
-                    +
-                  </span>
-                  {activeCommit.summary}
-                </p>
-              </div>
+              ) : (
+                <div className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/80 p-3.5 space-y-2 leading-relaxed">
+                  <div className="text-[10px] text-[var(--text-muted)]">
+                    @@ -0,0 +1,4 @@ // SUMMARY_NOTES
+                  </div>
+                  <p className="font-sans text-xs text-[var(--text-primary)] leading-relaxed">
+                    <span className="font-mono text-[var(--accent-text)] mr-1.5">
+                      +
+                    </span>
+                    {activeCommit.summary}
+                  </p>
+                </div>
+              )}
 
               {/* Skills / Modules */}
               <div className="space-y-2 pt-1">
@@ -300,7 +461,7 @@ export default function JourneyScene() {
                 <button
                   type="button"
                   onClick={() => stepCommit(-1)}
-                  className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
+                  className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition cursor-pointer"
                 >
                   {t.sceneUi.prevCommit}
                 </button>
@@ -310,7 +471,7 @@ export default function JourneyScene() {
                 <button
                   type="button"
                   onClick={() => stepCommit(1)}
-                  className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
+                  className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition cursor-pointer"
                 >
                   {t.sceneUi.nextCommit}
                 </button>
@@ -322,4 +483,3 @@ export default function JourneyScene() {
     </section>
   );
 }
-

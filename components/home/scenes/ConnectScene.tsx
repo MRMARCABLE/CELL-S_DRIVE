@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { BOOT_REPLAY_EVENT } from "@/components/home/BootSequence";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
 import { profile } from "@/data/portfolio";
@@ -12,34 +13,118 @@ interface CliLogEntry {
   accent?: boolean;
 }
 
-const QUICK_COMMANDS = [
+const ALL_COMMANDS = [
   "help",
   "neofetch",
+  "ls projects",
   "sudo hire marcel",
   "quote",
   "chaos",
+  "chaos --overdrive",
   "coffee",
+  "whoami",
+  "theme shadow",
+  "theme bone",
+  "lang en",
+  "lang id",
+  "boot",
+  "copy",
+  "email --copy",
+  "logout",
+  "github",
+  "linkedin",
+  "credly",
+  "git-eng",
+  "email",
+  "clear",
+];
+
+const QUICK_COMMANDS = [
+  "help",
+  "neofetch",
+  "ls projects",
+  "sudo hire marcel",
+  "chaos --overdrive",
+  "theme shadow",
+  "theme bone",
+  "boot",
   "clear",
 ];
 
 export default function ConnectScene() {
-  const { t, locale } = useLanguage();
+  const { t, locale, setLocale } = useLanguage();
   const [input, setInput] = useState("");
+  const [history, setHistory] = useState<string[]>(["status --channels"]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+  const [copiedEmail, setCopiedEmail] = useState(false);
+  const [logoutPulse, setLogoutPulse] = useState(false);
+  const logContainerRef = useRef<HTMLDivElement | null>(null);
+  const copyTimerRef = useRef<number | null>(null);
+  const overdriveTimerRef = useRef<number | null>(null);
+  const logoutTimerRef = useRef<number | null>(null);
   const [logs, setLogs] = useState<CliLogEntry[]>([
     {
       id: 1,
       command: "status --channels",
       lines: [
         "READY // 5 direct channels mounted ([1] GitHub .. [5] Email).",
-        "Type 'help' or click a command pill below to interact.",
+        "Type 'help', press TAB to autocomplete, or ↑/↓ for command history.",
       ],
     },
   ]);
+
+  useEffect(() => {
+    const el = logContainerRef.current;
+    if (el) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [logs]);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) window.clearTimeout(copyTimerRef.current);
+      if (overdriveTimerRef.current) window.clearTimeout(overdriveTimerRef.current);
+      if (logoutTimerRef.current) window.clearTimeout(logoutTimerRef.current);
+      document.documentElement.classList.remove("chaos-overdrive");
+    };
+  }, []);
+
+  const copyEmailToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(profile.email);
+    } catch {
+      // Clipboard API may be blocked in non-HTTPS contexts
+    }
+    setCopiedEmail(true);
+    if (copyTimerRef.current) window.clearTimeout(copyTimerRef.current);
+    copyTimerRef.current = window.setTimeout(() => {
+      setCopiedEmail(false);
+    }, 2200);
+  };
+
+  const applyTheme = (mode: "shadow" | "bone") => {
+    const isDark = mode === "shadow";
+    document.documentElement.classList.toggle("dark", isDark);
+    try {
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    } catch {
+      // Ignore storage errors in restricted environments
+    }
+  };
+
+  const triggerBootReplay = () => {
+    window.dispatchEvent(new Event(BOOT_REPLAY_EVENT));
+  };
 
   const runCommand = (rawCmd: string) => {
     const trimmed = rawCmd.trim();
     if (!trimmed) return;
     const cmd = trimmed.toLowerCase();
+
+    setHistory((prev) =>
+      prev[prev.length - 1] === trimmed ? prev : [...prev.slice(-24), trimmed]
+    );
+    setHistoryIndex(-1);
 
     if (cmd === "clear" || cmd === "cls") {
       setLogs([]);
@@ -53,22 +138,24 @@ export default function ConnectScene() {
     if (cmd === "help") {
       lines = [
         "Available commands in marca-sh:",
-        "  1 | github             → Open GitHub (github.com/MRMARCABLE)",
-        "  2 | linkedin           → Open LinkedIn profile",
-        "  3 | credly             → Open verified Credly badges",
-        "  4 | git-eng            → Open UKWMS Git-Eng repository",
-        "  5 | email              → Compose email to yohanneslalopua@gmail.com",
+        "  1..5 | github..email   → Open mounted communication channels",
+        "  copy | email --copy    → Copy yohanneslalopua@gmail.com to clipboard",
+        "  ls projects            → List archived systems & prototypes",
+        "  theme shadow | bone    → Switch canvas between Shadow & Bone themes",
+        "  lang en | id           → Switch session language (EN / ID)",
+        "  boot                   → Replay full-screen vortex boot sequence",
+        "  chaos | --overdrive    → Ignite binary star resonance burst",
         "  neofetch               → Display system & developer specifications",
         "  sudo hire marcel       → Execute internship/collaboration handshake",
         "  quote                  → Print core philosophical epigraphs",
-        "  chaos                  → Trigger binary star burst",
-        "  coffee                 → Check caffeine & build telemetry",
-        "  clear                  → Clear terminal buffer",
+        "  coffee / whoami        → Check runtime status & developer identity",
+        "  logout                 → Seal session & pulse final imprint",
+        "  clear                  → Clear terminal buffer (↑/↓ history, TAB complete)",
       ];
     } else if (cmd === "neofetch") {
       accent = true;
       lines = [
-        "   ✦  MARCA.OS // v2.0      marca@ukwms",
+        "   ✦  MARCA.OS // v2.1      marca@ukwms",
         "  ╱ ╲  ───────────────      ───────────",
         " ✦   ✦ OS:                  CELL-S_DRIVE (Next.js 16 + React 19)",
         "  ╲ ╱  Host:                UKWMS Informatics (NRP 5803025050)",
@@ -76,6 +163,50 @@ export default function ConnectScene() {
         "       Pillars:             AI.AGENT ♦ | SYS.EMBED ♣ | WEB.3D_UX ♠",
         "       Credentials:         4× Credly Verified + Codelamp Appreciation",
         `       Status:              ${t.hero.availability}`,
+      ];
+    } else if (cmd === "ls projects" || cmd === "projects") {
+      accent = true;
+      lines = [
+        `TOTAL ${t.projects.length} MODULES IN ~/projects:`,
+        ...t.projects.map(
+          (proj) =>
+            `  [${proj.code}] ${proj.title} (${proj.year}) — ${proj.category.toUpperCase()}`
+        ),
+      ];
+    } else if (cmd === "theme shadow" || cmd === "theme dark") {
+      accent = true;
+      applyTheme("shadow");
+      lines = ["DISPLAY_THEME → SHADOW (#09090b) activated."];
+    } else if (cmd === "theme bone" || cmd === "theme light") {
+      accent = true;
+      applyTheme("bone");
+      lines = ["DISPLAY_THEME → BONE (#eae8df) activated."];
+    } else if (cmd === "lang en") {
+      setLocale("en");
+      accent = true;
+      lines = ["LOCALE_SET → en-US (English) applied across all 6 scenes."];
+    } else if (cmd === "lang id") {
+      setLocale("id");
+      accent = true;
+      lines = ["LOCALE_SET → id-ID (Bahasa Indonesia) diterapkan ke semua scene."];
+    } else if (cmd === "boot" || cmd === "reboot") {
+      accent = true;
+      lines = ["SIGNAL_SENT → Replaying Scene 00 :: Vortex BootSequence..."];
+      triggerBootReplay();
+    } else if (cmd === "copy" || cmd === "email --copy") {
+      accent = true;
+      void copyEmailToClipboard();
+      lines = [`CLIPBOARD_WRITE ✓ → ${profile.email}`];
+    } else if (cmd === "logout") {
+      accent = true;
+      setLogoutPulse(true);
+      if (logoutTimerRef.current) window.clearTimeout(logoutTimerRef.current);
+      logoutTimerRef.current = window.setTimeout(() => {
+        setLogoutPulse(false);
+      }, 3200);
+      lines = [
+        "SESSION_SEALED :: Final imprint highlighted.",
+        `“${t.quotes.neverHalfHearted}”`,
       ];
     } else if (cmd === "sudo hire marcel" || cmd === "hire") {
       accent = true;
@@ -92,10 +223,15 @@ export default function ConnectScene() {
         `[02] “${t.quotes.sufferCreation}”`,
         `[03] “${t.quotes.neverHalfHearted}”`,
       ];
-    } else if (cmd === "chaos" || cmd === "matrix") {
+    } else if (cmd === "chaos" || cmd === "matrix" || cmd === "chaos --overdrive") {
       accent = true;
+      document.documentElement.classList.add("chaos-overdrive");
+      if (overdriveTimerRef.current) window.clearTimeout(overdriveTimerRef.current);
+      overdriveTimerRef.current = window.setTimeout(() => {
+        document.documentElement.classList.remove("chaos-overdrive");
+      }, 4500);
       lines = [
-        "01001101 01000001 01010010 01000011 01000001 :: ✦ DANCING_STAR_IGNITED",
+        "01001101 01000001 01010010 01000011 01000001 :: ✦ CHAOS_OVERDRIVE (4.5s)",
         `“${t.quotes.chaosStar}”`,
       ];
     } else if (cmd === "coffee") {
@@ -143,6 +279,40 @@ export default function ConnectScene() {
     setInput("");
   };
 
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      if (history.length === 0) return;
+      const nextIndex =
+        historyIndex === -1
+          ? history.length - 1
+          : Math.max(0, historyIndex - 1);
+      setHistoryIndex(nextIndex);
+      setInput(history[nextIndex]);
+    } else if (e.key === "ArrowDown") {
+      e.preventDefault();
+      if (historyIndex === -1) return;
+      if (historyIndex >= history.length - 1) {
+        setHistoryIndex(-1);
+        setInput("");
+      } else {
+        const nextIndex = historyIndex + 1;
+        setHistoryIndex(nextIndex);
+        setInput(history[nextIndex]);
+      }
+    } else if (e.key === "Tab") {
+      e.preventDefault();
+      const query = input.trim().toLowerCase();
+      if (!query) return;
+      const match = ALL_COMMANDS.find((candidate) =>
+        candidate.startsWith(query)
+      );
+      if (match) {
+        setInput(match);
+      }
+    }
+  };
+
   return (
     <section id="scene-06" data-scene-index="06" className="scene-stage">
       <ScenePrompt
@@ -150,6 +320,17 @@ export default function ConnectScene() {
         command="./connect --interactive"
         subtitle={t.sections.networkHeading}
         badge={t.sections.networkBadge}
+        rightSlot={
+          <button
+            type="button"
+            onClick={triggerBootReplay}
+            data-cursor="key"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-3 py-1.5 font-mono text-[11px] text-[var(--text-secondary)] hover:border-[var(--accent-border)] hover:text-[var(--accent-text)] transition cursor-pointer"
+          >
+            <span aria-hidden="true">↺</span>
+            <span>{t.sceneUi.replayIntroBtn}</span>
+          </button>
+        }
       />
 
       <div className="space-y-6">
@@ -255,28 +436,46 @@ export default function ConnectScene() {
             </span>
           </a>
 
-          <a
-            href={`mailto:${profile.email}`}
-            className="soft-card soft-card-interactive group sm:col-span-2 rounded-2xl p-5 flex items-center justify-between gap-4"
-          >
-            <div className="space-y-1">
+          <div className="soft-card soft-card-interactive sm:col-span-2 rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <a
+              href={`mailto:${profile.email}`}
+              className="group flex-1 space-y-1 focus:outline-none"
+            >
               <div className="flex items-center gap-2 font-mono text-xs text-[var(--accent-text)]">
                 <span className="rounded border border-[var(--accent-border)] bg-[var(--accent-bg)] px-1.5 py-0.5 text-[10px]">
                   [5]
                 </span>
                 <span>{t.channels.emailTag}</span>
               </div>
-              <div className="text-base font-semibold text-[var(--text-primary)]">
+              <div className="text-base font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-text)] transition">
                 {profile.email}
               </div>
               <p className="text-xs text-[var(--text-secondary)]">
                 {t.channels.emailDesc}
               </p>
+            </a>
+            <div className="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                onClick={copyEmailToClipboard}
+                data-cursor="key"
+                className={`rounded-lg border px-3 py-1.5 font-mono text-xs font-medium transition cursor-pointer ${
+                  copiedEmail
+                    ? "border-[var(--accent-border)] bg-[var(--accent-bg)] text-[var(--accent-text)]"
+                    : "border-[var(--border-soft)] bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:border-[var(--accent-border)] hover:text-[var(--accent-text)]"
+                }`}
+              >
+                {copiedEmail ? `✓ ${t.sceneUi.emailCopiedBtn}` : t.sceneUi.copyEmailBtn}
+              </button>
+              <a
+                href={`mailto:${profile.email}`}
+                aria-label={`Compose email to ${profile.email}`}
+                className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--border-soft)] bg-[var(--bg-elevated)] font-mono text-sm text-[var(--accent-text)] hover:border-[var(--accent-border)] transition"
+              >
+                ↗
+              </a>
             </div>
-            <span className="font-mono text-lg text-[var(--accent-text)] group-hover:translate-x-0.5 transition">
-              ↗
-            </span>
-          </a>
+          </div>
         </div>
 
         {/* Interactive CLI Terminal Window */}
@@ -292,7 +491,7 @@ export default function ConnectScene() {
               </span>
             </div>
             <span className="text-[11px] text-[var(--text-muted)]">
-              [PRESS &apos;/&apos; TO FOCUS SHELL]
+              [PRESS &apos;/&apos; TO FOCUS · ↑/↓ HISTORY · TAB COMPLETE]
             </span>
           </div>
 
@@ -304,7 +503,7 @@ export default function ConnectScene() {
                 key={cmd}
                 type="button"
                 onClick={() => runCommand(cmd)}
-                className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2 py-0.5 text-[var(--text-secondary)] hover:border-[var(--accent-border)] hover:text-[var(--accent-text)] transition"
+                className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2 py-0.5 text-[var(--text-secondary)] hover:border-[var(--accent-border)] hover:text-[var(--accent-text)] transition cursor-pointer"
               >
                 {cmd}
               </button>
@@ -312,7 +511,10 @@ export default function ConnectScene() {
           </div>
 
           {/* Terminal Output History */}
-          <div className="max-h-64 overflow-y-auto p-4 space-y-3 font-mono text-xs bg-[var(--bg-surface)]/60">
+          <div
+            ref={logContainerRef}
+            className="max-h-64 overflow-y-auto p-4 space-y-3 font-mono text-xs bg-[var(--bg-surface)]/60"
+          >
             {logs.map((entry) => (
               <div key={entry.id} className="space-y-1">
                 <div className="flex items-center gap-2 text-[var(--text-muted)]">
@@ -356,7 +558,11 @@ export default function ConnectScene() {
               id="marca-cli-input"
               type="text"
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                setInput(e.target.value);
+                setHistoryIndex(-1);
+              }}
+              onKeyDown={handleInputKeyDown}
               placeholder={t.sceneUi.cliPlaceholder}
               autoComplete="off"
               spellCheck={false}
@@ -364,7 +570,7 @@ export default function ConnectScene() {
             />
             <button
               type="submit"
-              className="shrink-0 rounded-md border border-[var(--accent-border)] bg-[var(--accent-bg)] px-2.5 py-1 text-[11px] font-semibold text-[var(--accent-text)] hover:border-[var(--border-hover)] transition"
+              className="shrink-0 rounded-md border border-[var(--accent-border)] bg-[var(--accent-bg)] px-2.5 py-1 text-[11px] font-semibold text-[var(--accent-text)] hover:border-[var(--border-hover)] transition cursor-pointer"
             >
               RUN ↵
             </button>
@@ -372,7 +578,13 @@ export default function ConnectScene() {
         </div>
 
         {/* Final Session Sign-Off — Quote 3 (No Author Attribution) */}
-        <div className="rounded-2xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/75 p-6 sm:p-7 text-center space-y-3">
+        <div
+          className={`rounded-2xl border p-6 sm:p-7 text-center space-y-3 transition-all duration-500 ${
+            logoutPulse
+              ? "border-[var(--accent-border)] bg-[var(--accent-bg)] shadow-[0_0_28px_var(--scene-glow-1)]"
+              : "border-[var(--border-soft)] bg-[var(--bg-elevated)]/75"
+          }`}
+        >
           <div className="font-mono text-[11px] tracking-[0.2em] text-[var(--text-muted)] uppercase">
             marca@ukwms:~$ logout // SESSION_IMPRINT
           </div>

@@ -35,6 +35,8 @@ export interface LocalizedContent {
   };
   sceneUi: {
     verifiedIdentity: string;
+    revealPhotoBtn: string;
+    asciiMaskBtn: string;
     revealAllCards: string;
     hideAllCards: string;
     tapToFlip: string;
@@ -48,17 +50,28 @@ export interface LocalizedContent {
     filterAll: string;
     filterExp: string;
     filterEdu: string;
+    summaryMode: string;
+    diffMode: string;
+    chronologicalSort: string;
+    groupedSort: string;
     filterBusAll: string;
     modulesMounted: string;
     modulesCountLabel: string;
     statusOnline: string;
+    usedInProjects: string;
     inspectBadge: string;
     verifiedCompetencies: string;
     gpgValidLabel: string;
+    certificateValidLabel: string;
     cliPlaceholder: string;
     cliHint: string;
+    copyEmailBtn: string;
+    emailCopiedBtn: string;
+    replayIntroBtn: string;
     shortcutsFooter: string;
     clearFilter: string;
+    inspectSpec: string;
+    closeSpec: string;
   };
   hero: {
     sectionLabel: string;
@@ -129,9 +142,11 @@ export const translations: Record<Locale, LocalizedContent> = {
     },
     sceneUi: {
       verifiedIdentity: "IDENTITY_VERIFIED ✓",
+      revealPhotoBtn: "Reveal Photo",
+      asciiMaskBtn: "ASCII Matrix",
       revealAllCards: "Reveal All Cards",
       hideAllCards: "Reset Deck",
-      tapToFlip: "Click or tap card to flip",
+      tapToFlip: "Hover to tilt · Click card to flip",
       flipCardCue: "[ FLIP CARD ↻ ]",
       keyCapabilities: "KEY CAPABILITIES",
       activeLabel: "ACTIVE",
@@ -142,19 +157,31 @@ export const translations: Record<Locale, LocalizedContent> = {
       filterAll: "ALL",
       filterExp: "EXP",
       filterEdu: "EDU",
+      summaryMode: "SUMMARY",
+      diffMode: "DIFF",
+      chronologicalSort: "TIMELINE",
+      groupedSort: "BY TRACK",
       filterBusAll: "ALL BUSES ACTIVE",
       modulesMounted: "15 MODULES MOUNTED // 3 CIRCUIT BUSES",
       modulesCountLabel: "MODULES",
       statusOnline: "STATUS: ONLINE",
-      inspectBadge: "CREDENTIAL INSPECTOR // SELECT EMBLEM",
+      usedInProjects: "USED IN",
+      inspectBadge: "CREDENTIAL INSPECTOR // SELECT ITEM",
       verifiedCompetencies: "VERIFIED COMPETENCIES",
       gpgValidLabel: "GPG_SIG // OK ✓",
-      cliPlaceholder: "Type 'help', 'neofetch', 'quote', 'chaos', or '1'..'5'...",
+      certificateValidLabel: "CERT_ARCHIVE // VERIFIED ✓",
+      cliPlaceholder:
+        "Type 'help', 'neofetch', 'boot', 'theme', 'lang', or '1'..'5'...",
       cliHint:
-        "Interactive shell — try: help · neofetch · sudo hire marcel · quote · chaos · clear",
+        "Interactive shell — try: help · neofetch · sudo hire marcel · boot · chaos · copy",
+      copyEmailBtn: "Copy Email",
+      emailCopiedBtn: "Copied ✓",
+      replayIntroBtn: "Replay Intro",
       shortcutsFooter:
         "SHORTCUTS: [T] Theme · [L] Lang · [/] CLI · [1-6] Scene · [G P] Projects",
       clearFilter: "Show all",
+      inspectSpec: "Inspect Spec",
+      closeSpec: "Hide Spec",
     },
     hero: {
       sectionLabel: "01 // DEVELOPER PROFILE",
@@ -232,9 +259,11 @@ export const translations: Record<Locale, LocalizedContent> = {
     },
     sceneUi: {
       verifiedIdentity: "IDENTITAS TERVERIFIKASI ✓",
+      revealPhotoBtn: "Lihat Foto",
+      asciiMaskBtn: "Matriks ASCII",
       revealAllCards: "Buka Semua Kartu",
       hideAllCards: "Tutup Dek",
-      tapToFlip: "Klik atau ketuk kartu untuk membalik",
+      tapToFlip: "Arahkan kursor untuk memiringkan · Klik kartu untuk membalik",
       flipCardCue: "[ BALIK KARTU ↻ ]",
       keyCapabilities: "KAPABILITAS UTAMA",
       activeLabel: "AKTIF",
@@ -245,20 +274,31 @@ export const translations: Record<Locale, LocalizedContent> = {
       filterAll: "SEMUA",
       filterExp: "PENGALAMAN",
       filterEdu: "PENDIDIKAN",
+      summaryMode: "RINGKAS",
+      diffMode: "GIT DIFF",
+      chronologicalSort: "LINI MASA",
+      groupedSort: "PER JALUR",
       filterBusAll: "SEMUA BUS AKTIF",
       modulesMounted: "15 MODUL TERPASANG // 3 BUS SIRKUIT",
       modulesCountLabel: "MODUL",
       statusOnline: "STATUS: AKTIF",
-      inspectBadge: "INSPEKTOR KREDENSIAL // PILIH LENCANA",
+      usedInProjects: "DIPAKAI DI",
+      inspectBadge: "INSPEKTOR KREDENSIAL // PILIH ITEM",
       verifiedCompetencies: "KOMPETENSI TERVERIFIKASI",
       gpgValidLabel: "GPG_SIG // VALID ✓",
+      certificateValidLabel: "ARSIP_SERTIFIKAT // TERVERIFIKASI ✓",
       cliPlaceholder:
-        "Ketik 'help', 'neofetch', 'quote', 'chaos', atau '1'..'5'...",
+        "Ketik 'help', 'neofetch', 'boot', 'theme', 'lang', atau '1'..'5'...",
       cliHint:
-        "Shell interaktif — coba: help · neofetch · sudo hire marcel · quote · chaos · clear",
+        "Shell interaktif — coba: help · neofetch · sudo hire marcel · boot · chaos · copy",
+      copyEmailBtn: "Salin Email",
+      emailCopiedBtn: "Disalin ✓",
+      replayIntroBtn: "Putar Ulang Intro",
       shortcutsFooter:
         "PINTASAN: [T] Tema · [L] Bahasa · [/] CLI · [1-6] Scene · [G P] Proyek",
       clearFilter: "Tampilkan semua",
+      inspectSpec: "Lihat Spesifikasi",
+      closeSpec: "Tutup",
     },
     hero: {
       sectionLabel: "01 // PROFIL PENGEMBANG",
