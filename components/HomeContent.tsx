@@ -1,10 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useLanguage } from "@/components/LanguageProvider";
+import BootSequence from "@/components/home/BootSequence";
 import ScenePrompt from "@/components/home/ScenePrompt";
 import { useActiveScene } from "@/components/home/fx/hooks/useActiveScene";
+import FocusScene from "@/components/home/scenes/FocusScene";
+import IdentityScene from "@/components/home/scenes/IdentityScene";
 import { credlyBadges, profile } from "@/data/portfolio";
 
 export default function HomeContent() {
@@ -13,139 +15,13 @@ export default function HomeContent() {
 
   return (
     <div className="space-y-8">
+      <BootSequence />
+
       {/* 01 // PROFILE & HERO */}
-      <section
-        id="scene-01"
-        data-scene-index="01"
-        className="scene-stage"
-      >
-        <ScenePrompt
-          index="01"
-          command="whoami --profile"
-          badge={`STATUS: ${t.hero.availability}`}
-          subtitle={t.hero.sectionLabel}
-        />
-
-        <div className="soft-card relative rounded-2xl p-6 sm:p-8">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <div className="relative shrink-0 rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)] p-1.5 shadow-sm">
-              <Image
-                src={profile.avatarUrl}
-                alt={`Profile photo of ${profile.name}`}
-                width={96}
-                height={96}
-                priority
-                className="rounded-lg object-cover"
-              />
-              <span
-                title={t.hero.availability}
-                className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-[var(--bg-base)] bg-[var(--accent-text)]"
-              />
-            </div>
-
-            <div className="space-y-3">
-              <div className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 font-mono text-xs text-[var(--text-secondary)]">
-                <span>{t.hero.roleBadge}</span>
-              </div>
-
-              <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
-                {profile.name}
-              </h1>
-
-              <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed max-w-2xl">
-                {t.hero.bio}
-              </p>
-
-              <p className="font-mono text-xs italic text-[var(--accent-text)] pt-1">
-                {`“${t.quotes.chaosStar}”`}
-              </p>
-            </div>
-          </div>
-
-          <div className="mt-8 pt-6 border-t border-[var(--border-soft)] flex flex-wrap items-center justify-between gap-4">
-            <div className="flex flex-wrap items-center gap-3">
-              <Link
-                href="/projects"
-                className="inline-flex items-center gap-2 rounded-md bg-[var(--text-primary)] px-4 py-2 text-sm font-semibold text-[var(--bg-base)] hover:opacity-90 transition"
-              >
-                <span>{t.hero.exploreProjects}</span>
-                <span className="font-mono">→</span>
-              </Link>
-              <a
-                href={`mailto:${profile.email}`}
-                className="inline-flex items-center gap-2 rounded-md border border-[var(--accent-border)] bg-[var(--accent-bg)] px-4 py-2 text-sm font-medium text-[var(--accent-text)] hover:border-[var(--border-hover)] transition"
-              >
-                <span>{t.hero.contactMe}</span>
-                <span className="font-mono text-xs">↗</span>
-              </a>
-              <a
-                href={profile.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
-              >
-                <span>GitHub</span>
-                <span className="font-mono text-xs text-[var(--text-muted)]">↗</span>
-              </a>
-              <a
-                href={profile.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-4 py-2 text-sm font-medium text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
-              >
-                <span>LinkedIn</span>
-                <span className="font-mono text-xs text-[var(--text-muted)]">↗</span>
-              </a>
-            </div>
-
-            <div className="font-mono text-xs text-[var(--text-muted)]">
-              {profile.location.toUpperCase()}
-            </div>
-          </div>
-        </div>
-      </section>
+      <IdentityScene />
 
       {/* 02 // FOCUS & ENGINEERING DOMAINS */}
-      <section
-        id="scene-02"
-        data-scene-index="02"
-        className="scene-stage"
-      >
-        <ScenePrompt
-          index="02"
-          command="ls ./focus --deck"
-          badge={t.sections.focusBadge}
-          subtitle={t.sections.focusHeading}
-        />
-
-        <div className="grid gap-4 sm:grid-cols-3">
-          {t.focusDomains.map((domain) => (
-            <div
-              key={domain.id}
-              className="soft-card soft-card-interactive group rounded-2xl p-5 flex flex-col justify-between space-y-4"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs text-[var(--text-muted)]">
-                    {`${domain.id} ${domain.suit}`}
-                  </span>
-                  <span
-                    className={`rounded border px-2 py-0.5 font-mono text-[10px] ${domain.accent}`}
-                  >
-                    {domain.code}
-                  </span>
-                </div>
-                <h3 className="text-base font-semibold text-[var(--text-primary)] transition">
-                  {domain.title}
-                </h3>
-                <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
-                  {domain.desc}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      <FocusScene />
 
       {/* 03 // EXPERIENCE & EDUCATION */}
       <section
