@@ -63,16 +63,28 @@ export default function IdentityScene() {
   // Begin phasing out as the user scrolls past the middle of Scene 01 toward Scene 02
   const phaseOut = reducedMotion
     ? 0
-    : Math.max(0, Math.min(1, (scrollProgress - 0.42) / 0.52));
+    : Math.max(0, Math.min(1, (scrollProgress - 0.32) / 0.56));
 
   const stageStyle = reducedMotion
     ? undefined
     : {
-        transform: `translate3d(0, ${Math.round(-phaseOut * 18)}px, 0) scale(${(
+        transform: `translate3d(0, ${Math.round(phaseOut * 28)}px, 0) scale(${(
           1 -
-          phaseOut * 0.035
+          phaseOut * 0.025
         ).toFixed(3)})`,
-        opacity: Number((1 - phaseOut * 0.38).toFixed(3)),
+        opacity: Number((1 - phaseOut * 0.28).toFixed(3)),
+      };
+
+  // The giant stacked name glides downward and expands as it morphs into Scene 02's background container
+  const nameMorphStyle = reducedMotion
+    ? undefined
+    : {
+        transform: `translate3d(0, ${Math.round(phaseOut * 96)}px, 0) scale(${(
+          1 +
+          phaseOut * 0.12
+        ).toFixed(3)})`,
+        opacity: Number((1 - phaseOut * 0.55).toFixed(3)),
+        transformOrigin: "left center",
       };
 
   return (
@@ -124,13 +136,14 @@ export default function IdentityScene() {
             </span>
           </div>
 
-          {/* Giant Stacked Focal Name */}
+          {/* Giant Stacked Focal Name — descends into Scene 02's background container on scroll */}
           <h1
             aria-label={profile.name}
+            style={nameMorphStyle}
             onMouseEnter={() => {
               if (!reducedMotion && !scrambling) setScrambling(true);
             }}
-            className="font-sans text-[clamp(2.6rem,6.8vw,5.4rem)] font-extrabold uppercase leading-[0.92] tracking-tighter text-[var(--text-primary)] select-none"
+            className="font-sans text-[clamp(2.6rem,6.8vw,5.4rem)] font-extrabold uppercase leading-[0.92] tracking-tighter text-[var(--text-primary)] select-none transition-transform duration-150 will-change-transform"
           >
             <span className="block">YOHANNES</span>
             <span className="block text-[var(--accent-text)] transition-colors">
