@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
+import { useReducedMotion } from "@/components/home/fx/hooks/useReducedMotion";
+import { playSfx } from "@/components/shell/sound";
 import { profile } from "@/data/portfolio";
 
 interface CommitNode {
@@ -22,12 +24,32 @@ interface CommitNode {
 
 export default function JourneyScene() {
   const { t, locale } = useLanguage();
+  const reducedMotion = useReducedMotion();
   const [laneFilter, setLaneFilter] = useState<"all" | "exp" | "edu">("all");
   const [sortMode, setSortMode] = useState<"tracks" | "chronological">("tracks");
   const [inspectorView, setInspectorView] = useState<"summary" | "diff">(
     "summary"
   );
   const [selectedHash, setSelectedHash] = useState<string>("f580302");
+  const [streamReady, setStreamReady] = useState(false);
+  const sectionRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setStreamReady(true);
+          }
+        }
+      },
+      { threshold: 0.14 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const commits = useMemo<CommitNode[]>(() => {
     const eduNodes: CommitNode[] = t.education.map((edu, idx) => ({
@@ -98,8 +120,15 @@ export default function JourneyScene() {
     setSelectedHash(visibleCommits[nextIndex].hash);
   };
 
+  const isStreamReady = reducedMotion || streamReady;
+
   return (
-    <section id="scene-03" data-scene-index="03" className="scene-stage">
+    <section
+      ref={sectionRef}
+      id="scene-03"
+      data-scene-index="03"
+      className="scene-stage"
+    >
       <ScenePrompt
         index="03"
         command="git log --graph --all"
@@ -186,21 +215,32 @@ export default function JourneyScene() {
                 tabIndex={0}
                 aria-pressed={isSelected}
                 data-cursor="inspect"
-                onClick={() => setSelectedHash(node.hash)}
+                style={{
+                  transitionDelay: isStreamReady ? `${index * 95}ms` : "0ms",
+                }}
+                onClick={() => {
+                  playSfx("key");
+                  setSelectedHash(node.hash);
+                }}
                 onMouseEnter={() => setSelectedHash(node.hash)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     e.preventDefault();
+                    playSfx("key");
                     setSelectedHash(node.hash);
                   }
                 }}
-                className={`group relative flex items-stretch gap-3 sm:gap-4 rounded-2xl border p-4 sm:p-5 cursor-pointer transition-all focus:outline-none ${
+                className={`group relative flex items-stretch gap-3 sm:gap-4 rounded-2xl border p-4 sm:p-5 cursor-pointer transition-all duration-500 focus:outline-none ${
+                  isStreamReady
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-4"
+                } ${
                   isSelected
                     ? "border-[var(--accent-border)] bg-[var(--bg-surface)] shadow-md"
                     : "border-[var(--border-soft)] bg-[var(--bg-surface)]/70 hover:border-[var(--border-hover)]"
                 }`}
               >
-                {/* Authentic Dual-Lane SVG Git Branch Track */}
+                {/* Authentic Dual-Lane SVG Git Branch Track with Self-Drawing Stream */}
                 <div
                   aria-hidden="true"
                   className="relative w-12 shrink-0 select-none"
@@ -219,6 +259,11 @@ export default function JourneyScene() {
                         y2={100}
                         stroke="rgba(16, 185, 129, 0.42)"
                         strokeWidth="2"
+                        strokeDasharray="120"
+                        strokeDashoffset={isStreamReady ? "0" : "120"}
+                        style={{
+                          transition: `stroke-dashoffset 650ms ease ${index * 110}ms`,
+                        }}
                       />
                     ) : null}
 
@@ -235,6 +280,11 @@ export default function JourneyScene() {
                             : "rgba(56, 189, 248, 0.55)"
                         }
                         strokeWidth="2"
+                        strokeDasharray="120"
+                        strokeDashoffset={isStreamReady ? "0" : "120"}
+                        style={{
+                          transition: `stroke-dashoffset 650ms ease ${index * 110}ms`,
+                        }}
                       />
                     ) : prevNode ? (
                       <line
@@ -248,6 +298,11 @@ export default function JourneyScene() {
                             : "rgba(56, 189, 248, 0.5)"
                         }
                         strokeWidth="2"
+                        strokeDasharray="120"
+                        strokeDashoffset={isStreamReady ? "0" : "120"}
+                        style={{
+                          transition: `stroke-dashoffset 650ms ease ${index * 110}ms`,
+                        }}
                       />
                     ) : null}
 
@@ -264,6 +319,11 @@ export default function JourneyScene() {
                             : "rgba(56, 189, 248, 0.55)"
                         }
                         strokeWidth="2"
+                        strokeDasharray="120"
+                        strokeDashoffset={isStreamReady ? "0" : "120"}
+                        style={{
+                          transition: `stroke-dashoffset 650ms ease ${index * 110 + 120}ms`,
+                        }}
                       />
                     ) : nextNode ? (
                       <line
@@ -277,6 +337,11 @@ export default function JourneyScene() {
                             : "rgba(56, 189, 248, 0.5)"
                         }
                         strokeWidth="2"
+                        strokeDasharray="120"
+                        strokeDashoffset={isStreamReady ? "0" : "120"}
+                        style={{
+                          transition: `stroke-dashoffset 650ms ease ${index * 110 + 120}ms`,
+                        }}
                       />
                     ) : null}
                   </svg>
@@ -479,6 +544,17 @@ export default function JourneyScene() {
             </div>
           </div>
         ) : null}
+      </div>
+
+      {/* Outgoing Git-to-PCB Bus Bridge (03 -> 04) */}
+      <div
+        aria-hidden="true"
+        className="hidden md:flex flex-col items-center -mb-6 pt-3 pointer-events-none select-none"
+      >
+        <span className="rounded-full border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-0.5 font-mono text-[9px] tracking-[0.2em] text-[var(--text-muted)] uppercase">
+          03 → 04 // ROUTING GIT_HEAD TO PCB_BUS
+        </span>
+        <div className="h-6 w-px bg-gradient-to-b from-amber-500/60 to-sky-500/60" />
       </div>
     </section>
   );

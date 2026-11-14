@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
 import { playSfx } from "@/components/shell/sound";
@@ -140,6 +140,8 @@ function findMatchingProjects(
 export default function StackScene() {
   const { t, locale } = useLanguage();
   const [activeBus, setActiveBus] = useState<string | null>(null);
+  const [bootWaveActive, setBootWaveActive] = useState(false);
+  const sectionRef = useRef<HTMLElement | null>(null);
   const [selectedSkill, setSelectedSkill] = useState<{
     skill: string;
     busId: string;
@@ -149,6 +151,23 @@ export default function StackScene() {
     busId: "BUS_01",
     pinHex: "0x01",
   });
+
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setBootWaveActive(true);
+          }
+        }
+      },
+      { threshold: 0.16 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   // Compute strict sequential hex pin addresses (0x01..0x0F) without skipping indices
   const busesWithPins = useMemo(() => {
@@ -160,6 +179,7 @@ export default function StackScene() {
         ...group,
         keycaps: group.items.map((skill, idx) => ({
           skill,
+          pinIndex: startOffset + idx,
           pinHex: `0x${(startOffset + idx + 1)
             .toString(16)
             .toUpperCase()
@@ -180,7 +200,12 @@ export default function StackScene() {
   );
 
   return (
-    <section id="scene-04" data-scene-index="04" className="scene-stage">
+    <section
+      ref={sectionRef}
+      id="scene-04"
+      data-scene-index="04"
+      className="scene-stage"
+    >
       <ScenePrompt
         index="04"
         command="lsmod --matrix"
@@ -234,7 +259,7 @@ export default function StackScene() {
           </span>
         </div>
 
-        {/* Desktop SVG PCB Copper Trace Router */}
+        {/* Desktop SVG PCB Copper Trace Router with Flowing Signal Packets */}
         <div aria-hidden="true" className="hidden lg:block -my-2">
           <svg
             viewBox="0 0 900 44"
@@ -245,72 +270,102 @@ export default function StackScene() {
             <circle
               cx="450"
               cy="6"
-              r="4"
+              r="4.5"
               fill="var(--accent-text)"
             />
 
-            {/* Trace to BUS_01 (Left Column center ~150) */}
+            {/* Base & Signal Trace to BUS_01 (Left Column center ~150) */}
             <path
               d="M 450 6 L 450 18 L 150 18 L 150 42"
               fill="none"
               stroke={
                 activeBus === null || activeBus === "BUS_01"
-                  ? "rgba(56, 189, 248, 0.55)"
+                  ? "rgba(56, 189, 248, 0.3)"
                   : "var(--border-soft)"
               }
-              strokeWidth={activeBus === "BUS_01" ? "2.4" : "1.5"}
+              strokeWidth="1.6"
             />
+            {activeBus === null || activeBus === "BUS_01" ? (
+              <path
+                d="M 450 6 L 450 18 L 150 18 L 150 42"
+                fill="none"
+                stroke="rgba(56, 189, 248, 0.95)"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                className="pcb-signal-trace"
+              />
+            ) : null}
             <circle
               cx="150"
               cy="40"
               r="3.5"
               fill={
                 activeBus === null || activeBus === "BUS_01"
-                  ? "rgba(56, 189, 248, 0.9)"
+                  ? "rgba(56, 189, 248, 0.95)"
                   : "var(--border-soft)"
               }
             />
 
-            {/* Trace to BUS_02 (Center Column ~450) */}
+            {/* Base & Signal Trace to BUS_02 (Center Column ~450) */}
             <path
               d="M 450 6 L 450 42"
               fill="none"
               stroke={
                 activeBus === null || activeBus === "BUS_02"
-                  ? "rgba(251, 113, 133, 0.55)"
+                  ? "rgba(251, 113, 133, 0.3)"
                   : "var(--border-soft)"
               }
-              strokeWidth={activeBus === "BUS_02" ? "2.4" : "1.5"}
+              strokeWidth="1.6"
             />
+            {activeBus === null || activeBus === "BUS_02" ? (
+              <path
+                d="M 450 6 L 450 42"
+                fill="none"
+                stroke="rgba(251, 113, 133, 0.95)"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                className="pcb-signal-trace"
+              />
+            ) : null}
             <circle
               cx="450"
               cy="40"
               r="3.5"
               fill={
                 activeBus === null || activeBus === "BUS_02"
-                  ? "rgba(251, 113, 133, 0.9)"
+                  ? "rgba(251, 113, 133, 0.95)"
                   : "var(--border-soft)"
               }
             />
 
-            {/* Trace to BUS_03 (Right Column center ~750) */}
+            {/* Base & Signal Trace to BUS_03 (Right Column center ~750) */}
             <path
               d="M 450 6 L 450 18 L 750 18 L 750 42"
               fill="none"
               stroke={
                 activeBus === null || activeBus === "BUS_03"
-                  ? "rgba(52, 211, 153, 0.55)"
+                  ? "rgba(52, 211, 153, 0.3)"
                   : "var(--border-soft)"
               }
-              strokeWidth={activeBus === "BUS_03" ? "2.4" : "1.5"}
+              strokeWidth="1.6"
             />
+            {activeBus === null || activeBus === "BUS_03" ? (
+              <path
+                d="M 450 6 L 450 18 L 750 18 L 750 42"
+                fill="none"
+                stroke="rgba(52, 211, 153, 0.95)"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+                className="pcb-signal-trace"
+              />
+            ) : null}
             <circle
               cx="750"
               cy="40"
               r="3.5"
               fill={
                 activeBus === null || activeBus === "BUS_03"
-                  ? "rgba(52, 211, 153, 0.9)"
+                  ? "rgba(52, 211, 153, 0.95)"
                   : "var(--border-soft)"
               }
             />
@@ -355,9 +410,9 @@ export default function StackScene() {
                     {group.category}
                   </h3>
 
-                  {/* Mechanical Keycaps Grid */}
+                  {/* Mechanical Keycaps Grid with LED Boot-Up Wave */}
                   <div className="grid grid-cols-2 gap-2.5 pt-1">
-                    {group.keycaps.map(({ skill, pinHex }) => {
+                    {group.keycaps.map(({ skill, pinHex, pinIndex }) => {
                       const isKeySelected = selectedSkill.skill === skill;
 
                       return (
@@ -365,6 +420,11 @@ export default function StackScene() {
                           key={skill}
                           type="button"
                           data-cursor="key"
+                          style={
+                            bootWaveActive
+                              ? { animationDelay: `${pinIndex * 55}ms` }
+                              : undefined
+                          }
                           onClick={() => {
                             playSfx("key");
                             setSelectedSkill({
@@ -381,6 +441,8 @@ export default function StackScene() {
                             })
                           }
                           className={`group/key relative flex flex-col justify-between rounded-xl border border-b-[3px] p-2.5 text-left transition-all active:translate-y-0.5 cursor-pointer ${
+                            bootWaveActive ? "keycap-boot-active" : ""
+                          } ${
                             isKeySelected
                               ? "border-[var(--accent-border)] bg-[var(--bg-surface)] shadow-sm -translate-y-0.5"
                               : "border-[var(--border-soft)] bg-[var(--bg-surface)]/85 hover:border-[var(--border-hover)] hover:-translate-y-0.5"
@@ -457,6 +519,17 @@ export default function StackScene() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Outgoing Cryptographic Handshake Bridge (04 -> 05) */}
+      <div
+        aria-hidden="true"
+        className="hidden md:flex flex-col items-center -mb-6 pt-3 pointer-events-none select-none"
+      >
+        <span className="rounded-full border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-0.5 font-mono text-[9px] tracking-[0.2em] text-[var(--text-muted)] uppercase">
+          04 → 05 // GPG_SIGNATURE_HANDSHAKE
+        </span>
+        <div className="h-6 w-px bg-gradient-to-b from-sky-500/60 to-amber-500/60" />
       </div>
     </section>
   );
