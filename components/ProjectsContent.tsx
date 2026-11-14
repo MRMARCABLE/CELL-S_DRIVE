@@ -3,29 +3,42 @@
 import Link from "next/link";
 import { useLanguage } from "@/components/LanguageProvider";
 import ProjectCatalog from "@/components/ProjectCatalog";
+import ScenePrompt from "@/components/home/ScenePrompt";
 import { profile } from "@/data/portfolio";
 
 export default function ProjectsContent() {
   const { t } = useLanguage();
 
   return (
-    <div className="space-y-12 py-4">
+    <div className="space-y-10 py-4">
       {/* 01 // HEADER */}
-      <section className="soft-card rounded-2xl p-6 sm:p-8 space-y-4">
-        <div className="flex items-center justify-between border-b border-[var(--border-soft)] pb-4 font-mono text-xs text-[var(--text-muted)]">
-          <span>{t.projectsPage.catalogLabel}</span>
-          <span className="text-[var(--accent-text)]">
-            {`${t.projects.length} ${t.projectsPage.modulesIndexed}`}
-          </span>
-        </div>
+      <section>
+        <ScenePrompt
+          index="01"
+          command="ls ./projects --suite"
+          subtitle={t.projectsPage.catalogLabel}
+          badge={`${t.projects.length} ${t.projectsPage.modulesIndexed}`}
+        />
 
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
-            {t.projectsPage.title}
-          </h1>
-          <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-            {t.projectsPage.subtitle}
-          </p>
+        <div className="soft-card rounded-2xl p-6 sm:p-8 space-y-5">
+          <div className="space-y-2.5">
+            <h1 className="text-2xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+              {t.projectsPage.title}
+            </h1>
+            <p className="text-sm sm:text-base text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+              {t.projectsPage.subtitle}
+            </p>
+          </div>
+
+          {/* Quote 2 — Suffer in creation, endure in memory (No attribution) */}
+          <blockquote className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/75 px-4 py-3 font-mono text-xs sm:text-[13px] leading-relaxed text-[var(--text-secondary)]">
+            <span className="mr-2 text-[var(--accent-text)]" aria-hidden="true">
+              ✦
+            </span>
+            <span className="italic text-[var(--text-primary)]">
+              {`“${t.quotes.sufferCreation}”`}
+            </span>
+          </blockquote>
         </div>
       </section>
 
@@ -64,4 +77,3 @@ export default function ProjectsContent() {
     </div>
   );
 }
-

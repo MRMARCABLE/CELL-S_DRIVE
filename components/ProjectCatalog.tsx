@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
+import ScenePrompt from "@/components/home/ScenePrompt";
 import type { ProjectCategory } from "@/data/portfolio";
 
 const categories: Array<"All" | ProjectCategory> = [
@@ -25,42 +26,43 @@ export default function ProjectCatalog() {
 
   return (
     <section className="space-y-5">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[var(--border-soft)] pb-3">
-        <h2 className="font-mono text-xs tracking-wider text-[var(--text-secondary)] uppercase">
-          {t.projectsPage.featuredHeading}
-        </h2>
+      <ScenePrompt
+        index="02"
+        command="cat ./projects/*.spec"
+        subtitle={t.projectsPage.featuredHeading}
+        rightSlot={
+          <div
+            className="flex flex-wrap items-center gap-1.5"
+            role="tablist"
+            aria-label="Filter projects by category"
+          >
+            {categories.map((category) => {
+              const active = selectedCategory === category;
+              const label =
+                category === "All"
+                  ? t.projectsPage.allCategory
+                  : t.categoryLabels[category];
 
-        <div
-          className="flex flex-wrap items-center gap-1.5"
-          role="tablist"
-          aria-label="Filter projects by category"
-        >
-          {categories.map((category) => {
-            const active = selectedCategory === category;
-            const label =
-              category === "All"
-                ? t.projectsPage.allCategory
-                : t.categoryLabels[category];
-
-            return (
-              <button
-                key={category}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setSelectedCategory(category)}
-                className={`rounded-md px-2.5 py-1 font-mono text-[11px] transition cursor-pointer border ${
-                  active
-                    ? "bg-[var(--accent-bg)] text-[var(--accent-text)] border-[var(--accent-border)]"
-                    : "text-[var(--text-secondary)] border-[var(--border-soft)] bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]"
-                }`}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
+              return (
+                <button
+                  key={category}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setSelectedCategory(category)}
+                  className={`rounded-md px-2.5 py-1 font-mono text-[11px] transition cursor-pointer border ${
+                    active
+                      ? "bg-[var(--accent-bg)] text-[var(--accent-text)] border-[var(--accent-border)]"
+                      : "text-[var(--text-secondary)] border-[var(--border-soft)] bg-[var(--bg-elevated)] hover:text-[var(--text-primary)] hover:border-[var(--border-hover)]"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        }
+      />
 
       <div className="grid gap-5 sm:grid-cols-2">
         {filteredProjects.map((item) => (
