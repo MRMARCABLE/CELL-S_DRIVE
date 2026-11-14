@@ -91,7 +91,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <CommandPalette />
           <Navbar />
 
-          <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-6 py-10 lg:py-12">
+          <main className="relative z-10 flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 pt-3 pb-10 lg:pt-4 lg:pb-12">
             {children}
           </main>
 

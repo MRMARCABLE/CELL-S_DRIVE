@@ -14,27 +14,29 @@ export default function HomeContent() {
   useActiveScene();
 
   return (
-    <div className="space-y-8">
+    <>
       <SceneRail />
       <BootSequence />
 
-      {/* 01 // PROFILE & HERO */}
-      <IdentityScene />
+      <div className="space-y-12">
+        {/* 01 // PROFILE & HERO */}
+        <IdentityScene />
 
-      {/* 02 // FOCUS & ENGINEERING DOMAINS */}
-      <FocusScene />
+        {/* 02 // FOCUS & ENGINEERING DOMAINS */}
+        <FocusScene />
 
-      {/* 03 // EXPERIENCE & EDUCATION */}
-      <JourneyScene />
+        {/* 03 // EXPERIENCE & EDUCATION */}
+        <JourneyScene />
 
-      {/* 04 // TECH STACK MATRIX */}
-      <StackScene />
+        {/* 04 // TECH STACK MATRIX */}
+        <StackScene />
 
-      {/* 05 // VERIFIED CREDENTIALS & CERTIFICATES */}
-      <CredentialsScene />
+        {/* 05 // VERIFIED CREDENTIALS & CERTIFICATES */}
+        <CredentialsScene />
 
-      {/* 06 // REPOSITORIES, INTERACTIVE CLI & DIRECT CONTACT */}
-      <ConnectScene />
-    </div>
+        {/* 06 // REPOSITORIES, INTERACTIVE CLI & DIRECT CONTACT */}
+        <ConnectScene />
+      </div>
+    </>
   );
 }

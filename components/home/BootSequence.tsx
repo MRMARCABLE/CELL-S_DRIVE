@@ -192,7 +192,7 @@ export default function BootSequence() {
       aria-modal="true"
       aria-label="Terminal Boot Sequence"
       onClick={dismiss}
-      className={`fixed inset-0 z-[80] flex flex-col justify-between bg-[var(--bg-base)]/95 backdrop-blur-xl px-6 py-8 sm:px-12 sm:py-10 transition-opacity duration-300 cursor-pointer select-none overflow-hidden ${
+      className={`fixed inset-0 z-[100] h-dvh w-screen flex flex-col justify-between bg-[var(--bg-base)] px-6 py-6 sm:px-12 sm:py-9 transition-opacity duration-300 cursor-pointer select-none overflow-hidden ${
         fadingOut ? "opacity-0 pointer-events-none" : "opacity-100"
       }`}
     >
@@ -200,11 +200,11 @@ export default function BootSequence() {
       <canvas
         ref={canvasRef}
         aria-hidden="true"
-        className="pointer-events-none fixed inset-0 z-0 h-full w-full"
+        className="pointer-events-none absolute inset-0 z-0 h-full w-full"
       />
 
-      {/* Top terminal bar */}
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between gap-4 border-b border-[var(--border-soft)] pb-3 font-mono text-xs">
+      {/* Top terminal bar — full-screen edge-to-edge */}
+      <div className="relative z-10 flex w-full items-center justify-between gap-4 border-b border-[var(--border-soft)] pb-3.5 font-mono text-xs">
         <div className="flex items-center gap-2 text-[var(--text-secondary)]">
           <span className="inline-block h-2 w-2 rounded-full bg-[var(--accent-text)] animate-pulse" />
           <span className="text-[var(--accent-text)]">marca@ukwms:~$</span>
@@ -273,9 +273,9 @@ export default function BootSequence() {
         </div>
       </div>
 
-      {/* Bottom footer hint */}
-      <div className="relative z-10 mx-auto flex w-full max-w-5xl items-center justify-between border-t border-[var(--border-soft)] pt-3 font-mono text-[11px] text-[var(--text-muted)]">
-        <span>CELL-S_DRIVE // SESSION_STAGE v2.0</span>
+      {/* Bottom footer hint — full-screen edge-to-edge */}
+      <div className="relative z-10 flex w-full items-center justify-between border-t border-[var(--border-soft)] pt-3.5 font-mono text-[11px] text-[var(--text-muted)]">
+        <span>CELL-S_DRIVE // SESSION_STAGE v2.1</span>
         <span>[CLICK ANYWHERE OR PRESS ESC TO CONTINUE]</span>
       </div>
     </div>

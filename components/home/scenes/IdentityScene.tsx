@@ -2,12 +2,14 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "@/components/LanguageProvider";
 import ScenePrompt from "@/components/home/ScenePrompt";
 import AsciiPortrait from "@/components/home/fx/AsciiPortrait";
 import { useReducedMotion } from "@/components/home/fx/hooks/useReducedMotion";
 import { useScrollProgress } from "@/components/home/fx/hooks/useScrollProgress";
+import { playSfx } from "@/components/shell/sound";
+import { asciiPortraitDesktop } from "@/data/ascii-portrait";
 import { profile } from "@/data/portfolio";
 
 const SCRAMBLE_FRAMES = ["M4RC3L", "010101", "M✦RCEL", "MARC3L", "MARCEL"];
@@ -18,6 +20,19 @@ export default function IdentityScene() {
   const scrollProgress = useScrollProgress("scene-01");
   const [nameLabel, setNameLabel] = useState("MARCEL");
   const [scrambling, setScrambling] = useState(false);
+  const [asciiSettled, setAsciiSettled] = useState(false);
+  const [asciiOnlyMode, setAsciiOnlyMode] = useState(false);
+
+  const stageRef = useRef<HTMLDivElement | null>(null);
+  const spotlightRef = useRef<HTMLDivElement | null>(null);
+
+  // Gradually fade the ASCII layer evenly into the background & right-hand portrait after mount
+  useEffect(() => {
+    const id = window.setTimeout(() => {
+      setAsciiSettled(true);
+    }, 450);
+    return () => window.clearTimeout(id);
+  }, []);
 
   useEffect(() => {
     if (!scrambling || reducedMotion) return;
@@ -36,35 +51,92 @@ export default function IdentityScene() {
     };
   }, [reducedMotion, scrambling]);
 
+  const handleStageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const stage = stageRef.current;
+    const spot = spotlightRef.current;
+    if (!stage || !spot) return;
+    const rect = stage.getBoundingClientRect();
+    spot.style.setProperty(
+      "--spot-x",
+      `${Math.round(e.clientX - rect.left)}px`
+    );
+    spot.style.setProperty(
+      "--spot-y",
+      `${Math.round(e.clientY - rect.top)}px`
+    );
+    spot.style.opacity = "1";
+  };
+
+  const handleStageMouseLeave = () => {
+    if (spotlightRef.current) {
+      spotlightRef.current.style.opacity = "0";
+    }
+  };
+
   // Begin phasing out as the user scrolls past the middle of Scene 01 toward Scene 02
   const phaseOut = reducedMotion
     ? 0
-    : Math.max(0, Math.min(1, (scrollProgress - 0.38) / 0.52));
+    : Math.max(0, Math.min(1, (scrollProgress - 0.42) / 0.52));
 
   const stageStyle = reducedMotion
     ? undefined
     : {
-        transform: `translate3d(0, ${Math.round(-phaseOut * 20)}px, 0) scale(${(
+        transform: `translate3d(0, ${Math.round(-phaseOut * 18)}px, 0) scale(${(
           1 -
-          phaseOut * 0.04
+          phaseOut * 0.035
         ).toFixed(3)})`,
-        opacity: Number((1 - phaseOut * 0.42).toFixed(3)),
+        opacity: Number((1 - phaseOut * 0.38).toFixed(3)),
       };
 
   return (
-    <section id="scene-01" data-scene-index="01" className="scene-stage">
+    <section
+      id="scene-01"
+      data-scene-index="01"
+      className="min-h-[calc(100dvh-4.5rem)] flex flex-col justify-between py-2 sm:py-3"
+    >
       <ScenePrompt
         index="01"
         command="whoami --profile"
         subtitle={t.hero.sectionLabel}
         badge={`STATUS: ${t.hero.availability}`}
+        rightSlot={
+          <button
+            type="button"
+            onClick={() => {
+              playSfx("key");
+              setAsciiOnlyMode((prev) => !prev);
+            }}
+            data-cursor="decrypt"
+            className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 font-mono text-[11px] text-[var(--text-secondary)] hover:border-[var(--accent-border)] hover:text-[var(--accent-text)] transition cursor-pointer"
+          >
+            {asciiOnlyMode ? t.sceneUi.revealPhotoBtn : t.sceneUi.asciiMaskBtn}
+          </button>
+        }
       />
 
       <div
+        ref={stageRef}
         style={stageStyle}
-        className="soft-card relative overflow-hidden rounded-2xl p-6 sm:p-8 lg:p-10 transition-transform duration-150 will-change-transform"
+        onMouseMove={handleStageMouseMove}
+        onMouseLeave={handleStageMouseLeave}
+        className="soft-card relative flex-1 flex flex-col justify-between overflow-hidden rounded-3xl p-6 sm:p-9 lg:p-12 transition-transform duration-150 will-change-transform"
       >
-        <div className="grid items-center gap-8 lg:grid-cols-12">
+        {/* Full-Section Ambient ASCII Background that gradually fades evenly across the stage */}
+        <AsciiPortrait settled={asciiSettled} asciiFocus={asciiOnlyMode} />
+
+        {/* Cursor Radial Spotlight illuminating the ASCII background */}
+        <div
+          ref={spotlightRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-[1] opacity-0 transition-opacity duration-300"
+          style={{
+            background:
+              "radial-gradient(circle 220px at var(--spot-x, 70%) var(--spot-y, 50%), rgba(var(--scene-glow-1), 0.16), transparent 72%)",
+          }}
+        />
+
+        {/* Main Hero Grid: Left Focal Typography + Right Proportioned Blended Portrait */}
+        <div className="relative z-10 my-auto grid items-center gap-8 lg:grid-cols-12 py-2">
           {/* Left Column: Giant Stacked Name + Bio + Philosophical Quote */}
           <div className="lg:col-span-7 space-y-6">
             <div className="flex flex-wrap items-center gap-2.5">
@@ -72,7 +144,7 @@ export default function IdentityScene() {
                 <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent-text)]" />
                 <span>{t.hero.roleBadge}</span>
               </span>
-              <span className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-2.5 py-1 font-mono text-xs text-[var(--text-muted)]">
+              <span className="rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)]/90 px-2.5 py-1 font-mono text-xs text-[var(--text-muted)]">
                 NRP // 5803025050
               </span>
             </div>
@@ -83,7 +155,7 @@ export default function IdentityScene() {
               onMouseEnter={() => {
                 if (!reducedMotion && !scrambling) setScrambling(true);
               }}
-              className="font-sans text-[clamp(2.4rem,6vw,4.9rem)] font-extrabold uppercase leading-[0.92] tracking-tighter text-[var(--text-primary)] select-none"
+              className="font-sans text-[clamp(2.5rem,6.2vw,5.1rem)] font-extrabold uppercase leading-[0.92] tracking-tighter text-[var(--text-primary)] select-none"
             >
               <span className="block">YOHANNES</span>
               <span className="block text-[var(--accent-text)] transition-colors">
@@ -97,7 +169,7 @@ export default function IdentityScene() {
             </p>
 
             {/* Philosophical Quote 1 (No attribution) */}
-            <blockquote className="rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/70 px-4 py-3 font-mono text-xs sm:text-[13px] leading-relaxed text-[var(--text-secondary)]">
+            <blockquote className="max-w-xl rounded-xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/80 backdrop-blur-sm px-4 py-3 font-mono text-xs sm:text-[13px] leading-relaxed text-[var(--text-secondary)]">
               <span
                 className="mr-2 text-[var(--accent-text)]"
                 aria-hidden="true"
@@ -110,39 +182,110 @@ export default function IdentityScene() {
             </blockquote>
           </div>
 
-          {/* Right Column: Interactive ASCII Portrait + Verified Photo Chip */}
+          {/* Right Column: Proportioned Portrait seamlessly blended with the ASCII background */}
           <div className="lg:col-span-5 flex flex-col items-center lg:items-end justify-center">
-            <div className="relative w-full max-w-[430px]">
-              <AsciiPortrait className="w-full" />
+            <div
+              role="button"
+              tabIndex={0}
+              aria-pressed={asciiOnlyMode}
+              aria-label={
+                asciiOnlyMode ? t.sceneUi.revealPhotoBtn : t.sceneUi.asciiMaskBtn
+              }
+              data-cursor="decrypt"
+              onClick={() => {
+                playSfx("key");
+                setAsciiOnlyMode((prev) => !prev);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  playSfx("key");
+                  setAsciiOnlyMode((prev) => !prev);
+                }
+              }}
+              className="group/portrait relative w-full max-w-[280px] sm:max-w-[320px] lg:max-w-[350px] cursor-pointer focus:outline-none"
+            >
+              {/* Soft outer ambient glow syncing the portrait with the ASCII field */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute -inset-3 rounded-3xl opacity-55 blur-2xl transition-opacity duration-700 group-hover/portrait:opacity-80"
+                style={{
+                  background:
+                    "radial-gradient(circle at 50% 45%, rgba(var(--scene-glow-1), 0.25), transparent 72%)",
+                }}
+              />
 
-              {/* Verified Real Photo Chip anchored below/on the ASCII Matrix */}
-              <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-[var(--border-soft)] bg-[var(--bg-surface)]/95 backdrop-blur-md p-2.5 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="relative shrink-0">
-                    <Image
-                      src="/avatar.png"
-                      alt={`Profile photo of ${profile.name}`}
-                      width={44}
-                      height={44}
-                      priority
-                      className="h-11 w-11 rounded-lg object-cover border border-[var(--border-soft)]"
-                    />
+              {/* Proportioned 4:5 Portrait Frame */}
+              <div className="relative aspect-[4/5] w-full overflow-hidden rounded-3xl border border-[var(--border-soft)] bg-[var(--bg-elevated)]/70 shadow-xl backdrop-blur-sm">
+                {/* Real Proportioned Photo (/avatar.png) */}
+                <Image
+                  src="/avatar.png"
+                  alt={`Portrait of ${profile.name}`}
+                  fill
+                  priority
+                  sizes="(max-width: 640px) 280px, (max-width: 1024px) 320px, 350px"
+                  style={{
+                    maskImage:
+                      "radial-gradient(ellipse 92% 92% at 50% 46%, black 58%, rgba(0,0,0,0.65) 82%, transparent 100%)",
+                    WebkitMaskImage:
+                      "radial-gradient(ellipse 92% 92% at 50% 46%, black 58%, rgba(0,0,0,0.65) 82%, transparent 100%)",
+                  }}
+                  className={`object-cover object-center transition-all duration-[1400ms] ease-out group-hover/portrait:scale-[1.02] ${
+                    asciiOnlyMode
+                      ? "opacity-15 scale-95 blur-[1px]"
+                      : asciiSettled
+                        ? "opacity-95 scale-100"
+                        : "opacity-25 scale-[0.98]"
+                  }`}
+                />
+
+                {/* Overlaid ASCII Veil that gradually fades evenly into the photo */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    maskImage:
+                      "radial-gradient(ellipse 95% 90% at 50% 50%, black 45%, transparent 98%)",
+                    WebkitMaskImage:
+                      "radial-gradient(ellipse 95% 90% at 50% 50%, black 45%, transparent 98%)",
+                  }}
+                  className={`pointer-events-none absolute inset-0 flex items-center justify-center p-2 font-mono transition-opacity duration-[1500ms] ease-out ${
+                    asciiOnlyMode
+                      ? "opacity-95"
+                      : asciiSettled
+                        ? "opacity-20 group-hover/portrait:opacity-35"
+                        : "opacity-85"
+                  }`}
+                >
+                  <pre className="text-[6.8px] sm:text-[7.5px] leading-[1.05] tracking-[0.03em] text-[var(--accent-text)]">
+                    {asciiPortraitDesktop.join("\n")}
+                  </pre>
+                </div>
+
+                {/* Soft Bottom & Edge Gradient Blending */}
+                <div
+                  aria-hidden="true"
+                  className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[var(--bg-surface)] via-transparent to-transparent opacity-85"
+                />
+
+                {/* Floating Verified Identity Bar inside the bottom of the portrait */}
+                <div className="absolute inset-x-3 bottom-3 z-10 flex items-center justify-between gap-2 rounded-2xl border border-[var(--border-soft)] bg-[var(--bg-surface)]/90 px-3.5 py-2.5 backdrop-blur-md shadow-sm">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     <span
                       title={t.hero.availability}
-                      className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-[var(--bg-base)] bg-[var(--accent-text)]"
+                      className="h-2.5 w-2.5 shrink-0 rounded-full bg-[var(--accent-text)] animate-pulse"
                     />
-                  </div>
-                  <div className="font-mono text-[11px] leading-tight">
-                    <div className="font-semibold text-[var(--text-primary)]">
-                      @MRMARCABLE
+                    <div className="font-mono text-[11px] leading-tight truncate">
+                      <div className="font-semibold text-[var(--text-primary)] truncate">
+                        @MRMARCABLE
+                      </div>
+                      <div className="text-[10px] text-[var(--text-muted)] truncate">
+                        {profile.location}
+                      </div>
                     </div>
-                    <div className="text-[10px] text-[var(--text-muted)]">
-                      {profile.location}
-                    </div>
                   </div>
-                </div>
-                <div className="font-mono text-[10px] text-[var(--accent-text)] text-right">
-                  {t.sceneUi.verifiedIdentity}
+                  <span className="shrink-0 font-mono text-[10px] font-semibold text-[var(--accent-text)]">
+                    {t.sceneUi.verifiedIdentity}
+                  </span>
                 </div>
               </div>
             </div>
@@ -150,7 +293,7 @@ export default function IdentityScene() {
         </div>
 
         {/* Bottom Action & Scroll Phase Bar */}
-        <div className="mt-8 pt-6 border-t border-[var(--border-soft)] flex flex-wrap items-center justify-between gap-4">
+        <div className="relative z-10 mt-6 pt-5 border-t border-[var(--border-soft)] flex flex-wrap items-center justify-between gap-4">
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/projects"
@@ -168,7 +311,7 @@ export default function IdentityScene() {
             </Link>
             <a
               href={`mailto:${profile.email}`}
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-hover)] transition"
+              className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)]/90 px-4 py-2 text-sm font-medium text-[var(--text-primary)] hover:border-[var(--border-hover)] transition"
             >
               <span>{t.hero.contactMe}</span>
               <span className="font-mono text-xs">↗</span>
@@ -177,7 +320,7 @@ export default function IdentityScene() {
               href={profile.githubUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
+              className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)]/90 px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
             >
               <span>GitHub</span>
               <span className="font-mono text-xs text-[var(--text-muted)]">
@@ -188,7 +331,7 @@ export default function IdentityScene() {
               href={profile.linkedinUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)] px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
+              className="inline-flex items-center gap-2 rounded-md border border-[var(--border-soft)] bg-[var(--bg-elevated)]/90 px-3.5 py-2 text-sm font-medium text-[var(--text-secondary)] hover:border-[var(--border-hover)] hover:text-[var(--text-primary)] transition"
             >
               <span>LinkedIn</span>
               <span className="font-mono text-xs text-[var(--text-muted)]">
